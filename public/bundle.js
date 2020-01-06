@@ -5663,9 +5663,9 @@
   // it will attach a property `"pointer"` with the value `true` to
   // selection transactions directly caused by mouse or touch input, and
   // a `"uiEvent"` property of that may be `"paste"`, `"cut"`, or `"drop"`.
-  var Transaction = /*@__PURE__*/(function (Transform$$1) {
+  var Transaction = /*@__PURE__*/(function (Transform) {
     function Transaction(state) {
-      Transform$$1.call(this, state.doc);
+      Transform.call(this, state.doc);
       // :: number
       // The timestamp associated with this transaction, in the same
       // format as `Date.now()`.
@@ -5683,8 +5683,8 @@
       this.meta = Object.create(null);
     }
 
-    if ( Transform$$1 ) Transaction.__proto__ = Transform$$1;
-    Transaction.prototype = Object.create( Transform$$1 && Transform$$1.prototype );
+    if ( Transform ) Transaction.__proto__ = Transform;
+    Transaction.prototype = Object.create( Transform && Transform.prototype );
     Transaction.prototype.constructor = Transaction;
 
     var prototypeAccessors = { selection: { configurable: true },selectionSet: { configurable: true },storedMarksSet: { configurable: true },isGeneric: { configurable: true },scrolledIntoView: { configurable: true } };
@@ -5758,7 +5758,7 @@
     };
 
     Transaction.prototype.addStep = function addStep (step, doc) {
-      Transform$$1.prototype.addStep.call(this, step, doc);
+      Transform.prototype.addStep.call(this, step, doc);
       this.updated = this.updated & ~UPDATED_MARKS;
       this.storedMarks = null;
     };
@@ -10028,7 +10028,7 @@
 
   InlineType.is = function is (span) { return span.type instanceof InlineType };
 
-  var NodeType$1 = function NodeType$$1(attrs, spec) {
+  var NodeType$1 = function NodeType(attrs, spec) {
     this.spec = spec || noSpec;
     this.attrs = attrs;
   };
@@ -13022,18 +13022,18 @@
 
   // ::- Gap cursor selections are represented using this class. Its
   // `$anchor` and `$head` properties both point at the cursor position.
-  var GapCursor = /*@__PURE__*/(function (Selection$$1) {
+  var GapCursor = /*@__PURE__*/(function (Selection) {
     function GapCursor($pos) {
-      Selection$$1.call(this, $pos, $pos);
+      Selection.call(this, $pos, $pos);
     }
 
-    if ( Selection$$1 ) GapCursor.__proto__ = Selection$$1;
-    GapCursor.prototype = Object.create( Selection$$1 && Selection$$1.prototype );
+    if ( Selection ) GapCursor.__proto__ = Selection;
+    GapCursor.prototype = Object.create( Selection && Selection.prototype );
     GapCursor.prototype.constructor = GapCursor;
 
     GapCursor.prototype.map = function map (doc, mapping) {
       var $pos = doc.resolve(mapping.map(this.head));
-      return GapCursor.valid($pos) ? new GapCursor($pos) : Selection$$1.near($pos)
+      return GapCursor.valid($pos) ? new GapCursor($pos) : Selection.near($pos)
     };
 
     GapCursor.prototype.content = function content () { return Slice.empty };
@@ -14706,6 +14706,210 @@
     return inputRules({rules})
   }
 
+  var schemaDominator = {
+      custom_html: {
+          content: "block+",
+          group: "block",
+          defining: true,
+          parseDOM: [{
+              // tag: 'div[class="custom-html"]'
+              tag: 'div.custom-html'
+          }],
+          toDOM() {
+              return ["div", 0]
+          }
+      },
+      layout_12: {
+          content: "block+",
+          group: "block",
+          defining: true,
+          parseDOM: [{
+              tag: 'div.layout_12'
+          }],
+          toDOM() {
+              return [
+                  "div",
+                  {
+                      class:"layout layout_12"
+                  },
+                  0
+              ]
+          }
+      },
+      layout_48: {
+          content: "block+",
+          group: "block",
+          defining: true,
+          parseDOM: [{
+              tag: 'div.layout_48'
+          }],
+          toDOM() {
+              return [
+                  "div",
+                  {
+                      class:"layout layout_48"
+                  },
+                  0
+              ]
+          }
+      },
+      layout_66: {
+          content: "block+",
+          group: "block",
+          defining: true,
+          parseDOM: [{
+              tag: 'div.layout_66'
+          }],
+          toDOM() {
+              return [
+                  "div",
+                  {
+                      class:"layout layout_66"
+                  },
+                  0
+              ]
+          }
+      },
+      layout_84: {
+          content: "block+",
+          group: "block",
+          defining: true,
+          parseDOM: [{
+              tag: 'div.layout_84'
+          }],
+          toDOM() {
+              return [
+                  "div",
+                  {
+                      class:"layout layout_84"
+                  },
+                  0
+              ]
+          }
+      },
+      layout_444: {
+          content: "block+",
+          group: "block",
+          defining: true,
+          parseDOM: [{
+              tag: 'div.layout_444'
+          }],
+          toDOM() {
+              return [
+                  "div",
+                  {
+                      class:"layout layout_444"
+                  },
+                  0
+              ]
+          }
+      },
+      layout_3333: {
+          content: "block+",
+          group: "block",
+          defining: true,
+          parseDOM: [{
+              tag: 'div.layout_3333'
+          }],
+          toDOM() {
+              return [
+                  "div",
+                  {
+                      class:"layout layout_3333"
+                  },
+                  0
+              ]
+          }
+      },
+
+      cl_3: {
+          content: "block+",
+          group: "block",
+          defining: true,
+          parseDOM: [{
+              tag: 'div.cl_3'
+          }],
+          toDOM() {
+              return [
+                  "div",
+                  {
+                      class:"cl_3"
+                  },
+                  0
+              ]
+          }
+      },
+      cl_4: {
+          content: "block+",
+          group: "block",
+          defining: true,
+          parseDOM: [{
+              tag: 'div.cl_4'
+          }],
+          toDOM() {
+              return [
+                  "div",
+                  {
+                      class:"cl_4"
+                  },
+                  0
+              ]
+          }
+      },
+      cl_6: {
+          content: "block+",
+          group: "block",
+          defining: true,
+          parseDOM: [{
+              tag: 'div.cl_6'
+          }],
+          toDOM() {
+              return [
+                  "div",
+                  {
+                      class:"cl_6"
+                  },
+                  0
+              ]
+          }
+      },
+      cl_8: {
+          content: "block+",
+          group: "block",
+          defining: true,
+          parseDOM: [{
+              tag: 'div.cl_8'
+          }],
+          toDOM() {
+              return [
+                  "div",
+                  {
+                      class:"cl_8"
+                  },
+                  0
+              ]
+          }
+      },
+      cl_12: {
+          content: "block+",
+          group: "block",
+          defining: true,
+          parseDOM: [{
+              tag: 'div.cl_12'
+          }],
+          toDOM() {
+              return [
+                  "div",
+                  {
+                      class:"cl_12"
+                  },
+                  0
+              ]
+          }
+      },
+
+  };
+
   window.DOMinator = class DOMinator {
 
       constructor(options) {
@@ -14724,8 +14928,12 @@
           }
 
           // init editorSchema
+          let nodes = addListNodes(schema.spec.nodes, "paragraph block*", "block");
+          nodes = addListNodes(nodes, "paragraph block*", "block");
+          nodes = this.addNodes(nodes, schemaDominator);
+          console.log(nodes);
           this.editorSchema = new Schema({
-              nodes: addListNodes(schema.spec.nodes, "paragraph block*", "block"),
+              nodes: nodes,
               marks: schema.spec.marks
           });
 
@@ -14756,6 +14964,14 @@
 
               })
           });
+      }
+
+      addNodes(nodes, newNodes){
+          Object.keys(newNodes).forEach(key => {
+              nodes = nodes.addToEnd(key, newNodes[key]);
+              // console.log('adding-'+key);
+          });
+          return nodes;
       }
 
   };

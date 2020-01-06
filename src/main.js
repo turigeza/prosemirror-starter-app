@@ -17,6 +17,7 @@ import {menuBar} from "prosemirror-menu"
 import {buildMenuItems} from "./menu"
 import {buildKeymap} from "./keymap"
 import {buildInputRules} from "./inputrules"
+import schemaDominator from "./schema-dominator"
 
 window.DOMinator = class DOMinator {
 
@@ -36,8 +37,12 @@ window.DOMinator = class DOMinator {
         }
 
         // init editorSchema
+        let nodes = addListNodes(schema.spec.nodes, "paragraph block*", "block");
+        nodes = addListNodes(nodes, "paragraph block*", "block");
+        nodes = this.addNodes(nodes, schemaDominator);
+        console.log(nodes);
         this.editorSchema = new Schema({
-            nodes: addListNodes(schema.spec.nodes, "paragraph block*", "block"),
+            nodes: nodes,
             marks: schema.spec.marks
         })
 
@@ -68,6 +73,14 @@ window.DOMinator = class DOMinator {
 
             })
         })
+    }
+
+    addNodes(nodes, newNodes){
+        Object.keys(newNodes).forEach(key => {
+            nodes = nodes.addToEnd(key, newNodes[key]);
+            // console.log('adding-'+key);
+        });
+        return nodes;
     }
 
 }

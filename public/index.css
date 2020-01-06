@@ -8,12 +8,12 @@ body{
 }
 #editor{
     /* background-color: LightSeaGreen; */
-    border: 1px solid LightSeaGreen;
+    border: 2px solid LightSeaGreen;
     float: left;
 }
 #content{
     /* background-color: Salmon; */
-    border: 1px solid Salmon;
+    border: 2px solid Salmon;
     float: right;
 }
 .ProseMirror-menubar{

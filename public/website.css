@@ -1,0 +1,201 @@
+/* all the website style where this editor is going to be used */
+body {
+    color: #222;
+    background-color: white;
+}
+
+div {
+    box-sizing: border-box;
+}
+
+#save {
+    background-color: Salmon;
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    padding: 20px;
+    cursor: pointer;
+    color: white;
+}
+
+.fancy, .ck.ck-list__item .ck-button.ck-on.ck-heading_heading2_fancy {
+    color: pink;
+}
+
+.custom-html {
+    overflow-y: auto;
+    position: relative;
+}
+img{
+    width: 100%;
+}
+/* grid */
+.cl_1,
+.cl_2,
+.cl_3,
+.cl_4,
+.cl_5,
+.cl_6,
+.cl_7,
+.cl_8,
+.cl_9,
+.cl_10,
+.cl_11,
+.cl_12 {
+    float: left;
+    /*border: 2px solid #ccc;*/
+    padding: 0px 15px 0px 15px;
+    position: relative;
+}
+
+.cl_1 p:first-child,
+.cl_2 p:first-child,
+.cl_3 p:first-child,
+.cl_4 p:first-child,
+.cl_5 p:first-child,
+.cl_6 p:first-child,
+.cl_7 p:first-child,
+.cl_8 p:first-child,
+.cl_9 p:first-child,
+.cl_10 p:first-child,
+.cl_11 p:first-child,
+.cl_12 p:first-child,
+.cl_1 h1:first-child,
+.cl_1 h2:first-child,
+.cl_1 h3:first-child,
+.cl_1 h4:first-child,
+.cl_1 h5:first-child,
+.cl_1 h6:first-child,
+.cl_2 h1:first-child,
+.cl_2 h2:first-child,
+.cl_2 h3:first-child,
+.cl_2 h4:first-child,
+.cl_2 h5:first-child,
+.cl_2 h6:first-child,
+.cl_3 h1:first-child,
+.cl_3 h2:first-child,
+.cl_3 h3:first-child,
+.cl_3 h4:first-child,
+.cl_3 h5:first-child,
+.cl_3 h6:first-child,
+.cl_4 h1:first-child,
+.cl_4 h2:first-child,
+.cl_4 h3:first-child,
+.cl_4 h4:first-child,
+.cl_4 h5:first-child,
+.cl_4 h6:first-child,
+.cl_5 h1:first-child,
+.cl_5 h2:first-child,
+.cl_5 h3:first-child,
+.cl_5 h4:first-child,
+.cl_5 h5:first-child,
+.cl_5 h6:first-child,
+.cl_6 h1:first-child,
+.cl_6 h2:first-child,
+.cl_6 h3:first-child,
+.cl_6 h4:first-child,
+.cl_6 h5:first-child,
+.cl_6 h6:first-child,
+.cl_7 h1:first-child,
+.cl_7 h2:first-child,
+.cl_7 h3:first-child,
+.cl_7 h4:first-child,
+.cl_7 h5:first-child,
+.cl_7 h6:first-child,
+.cl_8 h1:first-child,
+.cl_8 h2:first-child,
+.cl_8 h3:first-child,
+.cl_8 h4:first-child,
+.cl_8 h5:first-child,
+.cl_8 h6:first-child,
+.cl_9 h1:first-child,
+.cl_9 h2:first-child,
+.cl_9 h3:first-child,
+.cl_9 h4:first-child,
+.cl_9 h5:first-child,
+.cl_9 h6:first-child,
+.cl_10 h1:first-child,
+.cl_10 h2:first-child,
+.cl_10 h3:first-child,
+.cl_10 h4:first-child,
+.cl_10 h5:first-child,
+.cl_10 h6:first-child,
+.cl_11 h1:first-child,
+.cl_11 h2:first-child,
+.cl_11 h3:first-child,
+.cl_11 h4:first-child,
+.cl_11 h5:first-child,
+.cl_11 h6:first-child,
+.cl_12 h1:first-child,
+.cl_12 h2:first-child,
+.cl_12 h3:first-child,
+.cl_12 h4:first-child,
+.cl_12 h5:first-child,
+.cl_12 h6:first-child {
+    margin-top: 0;
+}
+
+.layout {
+    overflow-y: auto;
+    clear: both;
+    position: relative;
+    /* margin-left: -15px;
+            margin-right: -15px; */
+}
+
+.layout>div:first-child {
+    padding-left: 0;
+}
+
+.layout>div:last-child {
+    padding-right: 0;
+}
+
+.cl_1 {
+    width: 8.333333%;
+}
+
+.cl_2 {
+    width: 16.66666%;
+}
+
+.cl_3 {
+    width: 25%;
+}
+
+.cl_4 {
+    width: 33.33333%;
+}
+
+.cl_5 {
+    width: 41.66667%;
+}
+
+.cl_6 {
+    width: 50%;
+}
+
+.cl_7 {
+    width: 58.33333%;
+}
+
+.cl_8 {
+    width: 66.66666%;
+}
+
+.cl_9 {
+    width: 75%;
+}
+
+.cl_10 {
+    width: 83.33333%;
+}
+
+.cl_11 {
+    width: 91.66667%;
+}
+
+.cl_12 {
+    width: 100%;
+    clear: both;
+}
