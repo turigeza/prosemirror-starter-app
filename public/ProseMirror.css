@@ -60,7 +60,7 @@
     position: relative;
     outline: none;
     word-wrap: break-word;
-    white-space: pre-wrap;
+    /* white-space: pre-wrap; */
     -webkit-font-variant-ligatures: none;
     font-variant-ligatures: none;
 }
@@ -221,17 +221,20 @@ li.ProseMirror-selectednode:after {
 .ProseMirror-menu-submenu-wrap:hover .ProseMirror-menu-submenu, .ProseMirror-menu-submenu-wrap-active .ProseMirror-menu-submenu {
     display: block;
 }
-
+.ProseMirror-menubar-spacer{
+    display: none;
+}
 .ProseMirror-menubar {
     border-top-left-radius: inherit;
     border-top-right-radius: inherit;
-    position: relative;
     min-height: 1em;
     color: #666;
     padding: 1px 6px;
-    top: 0;
-    left: 0;
-    right: 0;
+    position: fixed !IMPORTANT;
+    width: 100%  !IMPORTANT;
+    top: 0 !IMPORTANT;
+    left: 0 !IMPORTANT;
+    right: 0 !IMPORTANT;
     border-bottom: 1px solid silver;
     background: white;
     z-index: 10;

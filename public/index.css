@@ -4,7 +4,7 @@ body{
 }
 #editor, #content{
     padding: 5px 20px 20px 20px;
-    width: 46%;
+    width: 48%;
 }
 #editor{
     /* background-color: LightSeaGreen; */
@@ -16,9 +16,10 @@ body{
     border: 2px solid Salmon;
     float: right;
 }
+/*
 .ProseMirror-menubar{
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    right: 0px;
-}
+    position: fixed !IMPORTANT;
+    top: 0px !IMPORTANT;
+    left: 0px !IMPORTANT;
+    right: 0px !IMPORTANT;
+} */

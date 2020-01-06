@@ -14708,7 +14708,7 @@
 
   var schemaDominator = {
       layout_12: {
-          content: "block+",
+          content: "cl_12{1}",
           group: "block",
           defining: true,
           parseDOM: [{
@@ -14725,7 +14725,7 @@
           }
       },
       layout_48: {
-          content: "block+",
+          content: "cl_4{1} cl_8{1}",
           group: "block",
           defining: true,
           parseDOM: [{
@@ -14742,7 +14742,7 @@
           }
       },
       layout_66: {
-          content: "block+",
+          content: "cl_6{2}",
           group: "block",
           defining: true,
           parseDOM: [{
@@ -14759,7 +14759,7 @@
           }
       },
       layout_84: {
-          content: "block+",
+          content: "cl_8{1} cl_4{1}",
           group: "block",
           defining: true,
           parseDOM: [{
@@ -14776,7 +14776,7 @@
           }
       },
       layout_444: {
-          content: "block+",
+          content: "cl_4{3}",
           group: "block",
           defining: true,
           parseDOM: [{
@@ -14793,7 +14793,7 @@
           }
       },
       layout_3333: {
-          content: "block+",
+          content: "cl_3{4}",
           group: "block",
           defining: true,
           parseDOM: [{
@@ -14900,8 +14900,13 @@
           group: "block",
           defining: true,
           draggable: true,
+          attrs: {dom: {default: {}}},
           parseDOM: [{
               tag: 'div',
+              getAttrs: dom => {
+                  console.log(dom);
+                  return { dom: dom };
+              }
               // ignore: true,
               // getAttrs: dom => {
               //     console.log(dom);
@@ -14913,12 +14918,14 @@
               // }
           }],
           toDOM(node) {
-              console.log(node);
-              let n = document.createElement("div");
-              n.innerHTML = '<p>Some shit</p>';
+              // console.log('node');
+              // console.log(node.attrs.dom);
+              // let n = document.createElement("div");
+              // n.innerHTML = '<p>Some shit</p>';
               // n.innerHtml = 'Heyho';
               // console.log(n)
-              return n;
+              let newClone = node.attrs.dom.cloneNode(true);
+              return newClone;
 
           }
       },
