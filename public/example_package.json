@@ -1,0 +1,29 @@
+{
+
+    "dependencies": {
+        "prosemirror-example-setup": "^1.0.1",
+
+        "prosemirror-commands": "^1.0.0",
+        "prosemirror-dropcursor": "^1.0.0",
+        "prosemirror-gapcursor": "^1.0.0",
+        "prosemirror-history": "^1.0.0",
+        "prosemirror-inputrules": "^1.0.0",
+        "prosemirror-keymap": "^1.0.0",
+        "prosemirror-menu": "^1.0.0",
+        "prosemirror-schema-list": "^1.0.0",
+        "prosemirror-state": "^1.0.0"
+    },
+
+    "devDependencies": {
+        "@rollup/plugin-buble": "^0.20.0",
+        "rollup": "^1.26.3"
+    },
+
+    "scripts": {
+        "build": "rollup -c",
+        "prepare": "npm run build",
+        "test": "true",
+        "watch": "rollup -c -w"
+    },
+    "style": "style/style.css"
+}
