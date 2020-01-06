@@ -1,0 +1,24 @@
+/* align the editor content with the original text to see what the editor changes because it should not change anything ! : ) */
+body{
+    padding: 10px;
+}
+#editor, #content{
+    padding: 5px 20px 20px 20px;
+    width: 46%;
+}
+#editor{
+    /* background-color: LightSeaGreen; */
+    border: 1px solid LightSeaGreen;
+    float: left;
+}
+#content{
+    /* background-color: Salmon; */
+    border: 1px solid Salmon;
+    float: right;
+}
+.ProseMirror-menubar{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+}
