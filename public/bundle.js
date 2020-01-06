@@ -14707,18 +14707,6 @@
   }
 
   var schemaDominator = {
-      custom_html: {
-          content: "block+",
-          group: "block",
-          defining: true,
-          parseDOM: [{
-              // tag: 'div[class="custom-html"]'
-              tag: 'div.custom-html'
-          }],
-          toDOM() {
-              return ["div", 0]
-          }
-      },
       layout_12: {
           content: "block+",
           group: "block",
@@ -14905,6 +14893,33 @@
                   },
                   0
               ]
+          }
+      },
+      custom_html: {
+          content: "block+",
+          group: "block",
+          defining: true,
+          draggable: true,
+          parseDOM: [{
+              tag: 'div',
+              // ignore: true,
+              // getAttrs: dom => {
+              //     console.log(dom);
+              //     // let type = dom.getAttribute("dino-type")
+              //     // return dinos.indexOf(type) > -1 ? {type} : false
+              // }
+              // getContent: dom => {
+              //     return 'This is the content of it.'
+              // }
+          }],
+          toDOM(node) {
+              console.log(node);
+              let n = document.createElement("div");
+              n.innerHTML = '<p>Some shit</p>';
+              // n.innerHtml = 'Heyho';
+              // console.log(n)
+              return n;
+
           }
       },
 
