@@ -14,8 +14,8 @@ It is NOT a production grade implementation. Please say that aloud. And again, o
 
 ### Use
 
-1. Clone the repo.
-2. Install the dependencies.
+1. Clone the repo. ```git clone git@github.com:turigeza/prosemirror-starter-app.git```
+2. Install the dependencies. ```npm install```
 3. Run the 'dev' script from package-json ( ```npm run dev```).
 4. Inspect the app in a browser at ```localhost:5000```.
 
