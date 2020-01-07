@@ -1,8 +1,9 @@
 export default {
     layout_12: {
         content: "cl_12{1}",
-        group: "block",
+        group: "block layout",
         defining: true,
+        selectable: true,
         parseDOM: [{
             tag: 'div.layout_12'
         }],
@@ -18,7 +19,7 @@ export default {
     },
     layout_48: {
         content: "cl_4{1} cl_8{1}",
-        group: "block",
+        group: "block layout",
         defining: true,
         parseDOM: [{
             tag: 'div.layout_48'
@@ -35,7 +36,7 @@ export default {
     },
     layout_66: {
         content: "cl_6{2}",
-        group: "block",
+        group: "block layout",
         defining: true,
         parseDOM: [{
             tag: 'div.layout_66'
@@ -52,7 +53,7 @@ export default {
     },
     layout_84: {
         content: "cl_8{1} cl_4{1}",
-        group: "block",
+        group: "block layout",
         defining: true,
         parseDOM: [{
             tag: 'div.layout_84'
@@ -69,7 +70,7 @@ export default {
     },
     layout_444: {
         content: "cl_4{3}",
-        group: "block",
+        group: "block layout",
         defining: true,
         parseDOM: [{
             tag: 'div.layout_444'
@@ -86,7 +87,7 @@ export default {
     },
     layout_3333: {
         content: "cl_3{4}",
-        group: "block",
+        group: "block layout",
         defining: true,
         parseDOM: [{
             tag: 'div.layout_3333'
@@ -104,8 +105,9 @@ export default {
 
     cl_3: {
         content: "block+",
-        group: "block",
+        group: "layout_columns",
         defining: true,
+        selectable: false,
         parseDOM: [{
             tag: 'div.cl_3'
         }],
@@ -121,8 +123,9 @@ export default {
     },
     cl_4: {
         content: "block+",
-        group: "block",
+        group: "layout_columns",
         defining: true,
+        selectable: false,
         parseDOM: [{
             tag: 'div.cl_4'
         }],
@@ -138,8 +141,9 @@ export default {
     },
     cl_6: {
         content: "block+",
-        group: "block",
+        group: "layout_columns",
         defining: true,
+        selectable: false,
         parseDOM: [{
             tag: 'div.cl_6'
         }],
@@ -155,8 +159,9 @@ export default {
     },
     cl_8: {
         content: "block+",
-        group: "block",
+        group: "layout_columns",
         defining: true,
+        selectable: false,
         parseDOM: [{
             tag: 'div.cl_8'
         }],
@@ -172,8 +177,9 @@ export default {
     },
     cl_12: {
         content: "block+",
-        group: "block",
+        group: "layout_columns",
         defining: true,
+        selectable: false,
         parseDOM: [{
             tag: 'div.cl_12'
         }],
@@ -191,12 +197,16 @@ export default {
         content: "block+",
         group: "block",
         defining: true,
-        draggable: true,
-        attrs: {dom: {default: {}}},
+        draggable: false,
+        selectable: true,
+        attrs: {
+            dom: {
+                default: {}
+            }
+        },
         parseDOM: [{
             tag: 'div',
             getAttrs: dom => {
-                console.log(dom);
                 return { dom: dom };
             }
             // ignore: true,

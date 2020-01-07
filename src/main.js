@@ -3,9 +3,6 @@ import {EditorView} from "prosemirror-view"
 import {Schema, DOMParser} from "prosemirror-model"
 import {addListNodes} from "prosemirror-schema-list"
 
-// We declared this dependency directly in our project.
-import {schema} from "prosemirror-schema-basic"
-
 // bring in the prosemirror-example-setup package define this as a dependency
 import {keymap} from "prosemirror-keymap"
 import {history} from "prosemirror-history"
@@ -17,6 +14,7 @@ import {menuBar} from "prosemirror-menu"
 import {buildMenuItems} from "./menu"
 import {buildKeymap} from "./keymap"
 import {buildInputRules} from "./inputrules"
+import {schema} from "./schema-basic"
 import schemaDominator from "./schema-dominator"
 
 window.DOMinator = class DOMinator {

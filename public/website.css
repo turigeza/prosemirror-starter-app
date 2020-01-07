@@ -26,6 +26,14 @@ div {
     overflow-y: auto;
     position: relative;
 }
+
+.text-LightSeaGreen {
+    color: LightSeaGreen;
+}
+.text-Salmon {
+    color: Salmon;
+}
+
 img{
     width: 100%;
 }

@@ -17,7 +17,6 @@
         "url": "git://github.com/prosemirror/prosemirror.git"
     },
     "dependencies": {
-        "prosemirror-schema-basic": "^1.0.0",
         "prosemirror-schema-list": "^1.0.0",
         "prosemirror-commands": "^1.0.0",
         "prosemirror-dropcursor": "^1.0.0",
