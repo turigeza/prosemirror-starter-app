@@ -16,6 +16,7 @@ import {buildKeymap} from "./keymap"
 import {buildInputRules} from "./inputrules"
 import {schema} from "./schema-basic"
 import schemaDominator from "./schema-dominator"
+import dominatormenu from "./dominatormenu"
 
 window.DOMinator = class DOMinator {
 
@@ -56,10 +57,7 @@ window.DOMinator = class DOMinator {
                     dropCursor(),
                     gapCursor(),
                     history(),
-                    menuBar({
-                        floating: this.options.floatingMenu !== false,
-                        content: this.options.menuContent || buildMenuItems(this.editorSchema).fullMenu
-                    }),
+                    dominatormenu(),
                     new Plugin({
                         props: {
                             attributes: {

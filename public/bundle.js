@@ -14012,9 +14012,12 @@
       let $from = state.selection.$from;
       for (let d = $from.depth; d >= 0; d--) {
           let index = $from.index(d);
-          if ($from.node(d).canReplaceWith(index, index, nodeType)) return true
+          if ($from.node(d).canReplaceWith(index, index, nodeType)) {
+              return true;
+          }
       }
-      return false
+
+      return false;
   }
 
   function insertImageItem(nodeType) {
@@ -14062,9 +14065,13 @@
           label: options.title,
           run: cmd
       };
-      for (let prop in options) passedOptions[prop] = options[prop];
-      if ((!options.enable || options.enable === true) && !options.select)
+      for (let prop in options) {
+          passedOptions[prop] = options[prop];
+      }
+
+      if ((!options.enable || options.enable === true) && !options.select){
           passedOptions[options.enable ? "enable" : "select"] = state => cmd(state);
+      }
 
       return new MenuItem(passedOptions)
   }
