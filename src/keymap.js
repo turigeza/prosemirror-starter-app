@@ -8,7 +8,7 @@ import {
     joinDown,
     lift,
     selectParentNode
-} from "prosemirror-commands"
+} from "./commands"
 import {
     wrapInList,
     splitListItem,

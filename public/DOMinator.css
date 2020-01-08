@@ -1,0 +1,19 @@
+.DOMinatorMenu{
+    background-color: red;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+}
+.DOMinatorMenu .menuicon{
+    padding: 15px;
+    text-transform: capitalize;
+    background-color: white;
+    display: inline-block;
+}
+.DOMinatorMenu .menuicon:hover{
+    background-color: #eee;
+    pointer-events: all;
+    cursor: pointer;
+}

@@ -4,22 +4,26 @@ import {Schema, DOMParser} from "prosemirror-model"
 import {addListNodes} from "prosemirror-schema-list"
 
 // bring in the prosemirror-example-setup package define this as a dependency
-import {keymap} from "prosemirror-keymap"
 import {history} from "prosemirror-history"
-import {baseKeymap} from "prosemirror-commands"
+
 import {dropCursor} from "prosemirror-dropcursor"
 import {gapCursor} from "prosemirror-gapcursor"
-import {menuBar} from "prosemirror-menu"
+// import {menuBar} from "prosemirror-menu"
 
-import {buildMenuItems} from "./menu"
+import {baseKeymap, toggleMark, setBlockType, wrapIn} from "./commands"
+//import {buildMenuItems} from "./menu"
 import {buildKeymap} from "./keymap"
+import {keymap} from "./prosemirror-keymap"
 import {buildInputRules} from "./inputrules"
 import {schema} from "./schema-basic"
 import schemaDominator from "./schema-dominator"
-import dominatormenu from "./dominatormenu"
+import {DominatorMenu} from "./dominatormenu"
+
 
 window.DOMinator = class DOMinator {
-
+    // editorSchema
+    // editorView
+    // menuItems
     constructor(options) {
         // init options
         const defaults = {
@@ -39,14 +43,17 @@ window.DOMinator = class DOMinator {
         let nodes = addListNodes(schema.spec.nodes, "paragraph block*", "block");
         nodes = addListNodes(nodes, "paragraph block*", "block");
         nodes = this.addNodes(nodes, schemaDominator);
-        console.log(nodes);
+
         this.editorSchema = new Schema({
             nodes: nodes,
             marks: schema.spec.marks
         })
 
+        this.initMenu();
+        var that = this;
         // init view
-        this.view = new EditorView(document.querySelector("#editor"), {
+        this.editorView = new EditorView(document.querySelector("#editor"), {
+
             state: EditorState.create({
                 doc: DOMParser.fromSchema(this.editorSchema).parse(document.querySelector("#content")),
                 // plugins: exampleSetup({schema: this.editorSchema}),
@@ -57,7 +64,13 @@ window.DOMinator = class DOMinator {
                     dropCursor(),
                     gapCursor(),
                     history(),
-                    dominatormenu(),
+                    new Plugin({
+                        view(editorView) {
+                            let menuView = new DominatorMenu(that.menuItems, editorView);
+                            editorView.dom.parentNode.insertBefore(menuView.dom, editorView.dom);
+                            return menuView;
+                        }
+                    }),
                     new Plugin({
                         props: {
                             attributes: {
@@ -71,6 +84,30 @@ window.DOMinator = class DOMinator {
         })
     }
 
+    initMenu(){
+        this.menuItems = [
+            {
+                command: toggleMark(this.editorSchema.marks.strong),
+                dom: this.icon("B", "strong")
+            },
+            {
+                command: toggleMark(this.editorSchema.marks.em),
+                dom: this.icon("i", "em")
+            },
+            {
+                command: setBlockType(this.editorSchema.nodes.paragraph),
+                dom: this.icon("p", "paragraph")
+            },
+            this.heading(1),
+            this.heading(2),
+            this.heading(3),
+            {
+                command: wrapIn(this.editorSchema.nodes.blockquote),
+                dom: this.icon(">", "blockquote")
+            }
+        ];
+    }
+
     addNodes(nodes, newNodes){
         Object.keys(newNodes).forEach(key => {
             nodes = nodes.addToEnd(key, newNodes[key]);
@@ -79,7 +116,29 @@ window.DOMinator = class DOMinator {
         return nodes;
     }
 
+    // Create an icon for a heading at the given level
+    heading(level) {
+        return {
+            command: setBlockType(this.editorSchema.nodes.heading, {
+                level
+            }),
+            dom: this.icon("H" + level, "heading")
+        }
+    }
+
+    // Helper function to create menu icons
+    icon(text, name) {
+        let span = document.createElement("span")
+        span.className = "menuicon " + name
+        span.title = name
+        span.textContent = text
+        return span;
+    }
+
 }
+
+
+
 
 // Mix the nodes from prosemirror-schema-list into the basic schema to
 // create a schema with list support.

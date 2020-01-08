@@ -1124,7 +1124,7 @@
   //
   // **Do not** directly mutate the properties of a `Node` object. See
   // [the guide](/docs/guide/#doc) for more information.
-  var Node$1 = function Node(type, attrs, content, marks) {
+  var Node = function Node(type, attrs, content, marks) {
     // :: NodeType
     // The type of node that this is.
     this.type = type;
@@ -1165,16 +1165,16 @@
   // :: (number) → Node
   // Get the child node at the given index. Raises an error when the
   // index is out of range.
-  Node$1.prototype.child = function child (index) { return this.content.child(index) };
+  Node.prototype.child = function child (index) { return this.content.child(index) };
 
   // :: (number) → ?Node
   // Get the child node at the given index, if it exists.
-  Node$1.prototype.maybeChild = function maybeChild (index) { return this.content.maybeChild(index) };
+  Node.prototype.maybeChild = function maybeChild (index) { return this.content.maybeChild(index) };
 
   // :: ((node: Node, offset: number, index: number))
   // Call `f` for every child node, passing the node, its offset
   // into this parent node, and its index.
-  Node$1.prototype.forEach = function forEach (f) { this.content.forEach(f); };
+  Node.prototype.forEach = function forEach (f) { this.content.forEach(f); };
 
   // :: (number, number, (node: Node, pos: number, parent: Node, index: number) → ?bool, ?number)
   // Invoke a callback for all descendant nodes recursively between
@@ -1184,7 +1184,7 @@
   // When the callback returns false for a given node, that node's
   // children will not be recursed over. The last parameter can be
   // used to specify a starting position to count from.
-  Node$1.prototype.nodesBetween = function nodesBetween (from, to, f, startPos) {
+  Node.prototype.nodesBetween = function nodesBetween (from, to, f, startPos) {
       if ( startPos === void 0 ) startPos = 0;
 
     this.content.nodesBetween(from, to, f, startPos, this);
@@ -1193,7 +1193,7 @@
   // :: ((node: Node, pos: number, parent: Node) → ?bool)
   // Call the given callback for every descendant node. Doesn't
   // descend into a node when the callback returns `false`.
-  Node$1.prototype.descendants = function descendants (f) {
+  Node.prototype.descendants = function descendants (f) {
     this.nodesBetween(0, this.content.size, f);
   };
 
@@ -1207,7 +1207,7 @@
   // `blockSeparator` is given, it will be inserted whenever a new
   // block node is started. When `leafText` is given, it'll be
   // inserted for every non-text leaf node encountered.
-  Node$1.prototype.textBetween = function textBetween (from, to, blockSeparator, leafText) {
+  Node.prototype.textBetween = function textBetween (from, to, blockSeparator, leafText) {
     return this.content.textBetween(from, to, blockSeparator, leafText)
   };
 
@@ -1223,21 +1223,21 @@
 
   // :: (Node) → bool
   // Test whether two nodes represent the same piece of document.
-  Node$1.prototype.eq = function eq (other) {
+  Node.prototype.eq = function eq (other) {
     return this == other || (this.sameMarkup(other) && this.content.eq(other.content))
   };
 
   // :: (Node) → bool
   // Compare the markup (type, attributes, and marks) of this node to
   // those of another. Returns `true` if both have the same markup.
-  Node$1.prototype.sameMarkup = function sameMarkup (other) {
+  Node.prototype.sameMarkup = function sameMarkup (other) {
     return this.hasMarkup(other.type, other.attrs, other.marks)
   };
 
   // :: (NodeType, ?Object, ?[Mark]) → bool
   // Check whether this node's markup correspond to the given type,
   // attributes, and marks.
-  Node$1.prototype.hasMarkup = function hasMarkup (type, attrs, marks) {
+  Node.prototype.hasMarkup = function hasMarkup (type, attrs, marks) {
     return this.type == type &&
       compareDeep(this.attrs, attrs || type.defaultAttrs || emptyAttrs) &&
       Mark.sameSet(this.marks, marks || Mark.none)
@@ -1246,7 +1246,7 @@
   // :: (?Fragment) → Node
   // Create a new node with the same markup as this node, containing
   // the given content (or empty, if no content is given).
-  Node$1.prototype.copy = function copy (content) {
+  Node.prototype.copy = function copy (content) {
       if ( content === void 0 ) content = null;
 
     if (content == this.content) { return this }
@@ -1256,7 +1256,7 @@
   // :: ([Mark]) → Node
   // Create a copy of this node, with the given set of marks instead
   // of the node's own marks.
-  Node$1.prototype.mark = function mark (marks) {
+  Node.prototype.mark = function mark (marks) {
     return marks == this.marks ? this : new this.constructor(this.type, this.attrs, this.content, marks)
   };
 
@@ -1264,7 +1264,7 @@
   // Create a copy of this node with only the content between the
   // given positions. If `to` is not given, it defaults to the end of
   // the node.
-  Node$1.prototype.cut = function cut (from, to) {
+  Node.prototype.cut = function cut (from, to) {
     if (from == 0 && to == this.content.size) { return this }
     return this.copy(this.content.cut(from, to))
   };
@@ -1272,7 +1272,7 @@
   // :: (number, ?number) → Slice
   // Cut out the part of the document between the given positions, and
   // return it as a `Slice` object.
-  Node$1.prototype.slice = function slice (from, to, includeParents) {
+  Node.prototype.slice = function slice (from, to, includeParents) {
       if ( to === void 0 ) to = this.content.size;
       if ( includeParents === void 0 ) includeParents = false;
 
@@ -1292,13 +1292,13 @@
   // content nodes must be valid children for the node they are placed
   // into. If any of this is violated, an error of type
   // [`ReplaceError`](#model.ReplaceError) is thrown.
-  Node$1.prototype.replace = function replace$1 (from, to, slice) {
+  Node.prototype.replace = function replace$1 (from, to, slice) {
     return replace(this.resolve(from), this.resolve(to), slice)
   };
 
   // :: (number) → ?Node
   // Find the node directly after the given position.
-  Node$1.prototype.nodeAt = function nodeAt (pos) {
+  Node.prototype.nodeAt = function nodeAt (pos) {
     for (var node = this;;) {
       var ref = node.content.findIndex(pos);
         var index = ref.index;
@@ -1314,7 +1314,7 @@
   // Find the (direct) child node after the given offset, if any,
   // and return it along with its index and offset relative to this
   // node.
-  Node$1.prototype.childAfter = function childAfter (pos) {
+  Node.prototype.childAfter = function childAfter (pos) {
     var ref = this.content.findIndex(pos);
       var index = ref.index;
       var offset = ref.offset;
@@ -1325,7 +1325,7 @@
   // Find the (direct) child node before the given offset, if any,
   // and return it along with its index and offset relative to this
   // node.
-  Node$1.prototype.childBefore = function childBefore (pos) {
+  Node.prototype.childBefore = function childBefore (pos) {
     if (pos == 0) { return {node: null, index: 0, offset: 0} }
     var ref = this.content.findIndex(pos);
       var index = ref.index;
@@ -1338,14 +1338,14 @@
   // :: (number) → ResolvedPos
   // Resolve the given position in the document, returning an
   // [object](#model.ResolvedPos) with information about its context.
-  Node$1.prototype.resolve = function resolve (pos) { return ResolvedPos.resolveCached(this, pos) };
+  Node.prototype.resolve = function resolve (pos) { return ResolvedPos.resolveCached(this, pos) };
 
-  Node$1.prototype.resolveNoCache = function resolveNoCache (pos) { return ResolvedPos.resolve(this, pos) };
+  Node.prototype.resolveNoCache = function resolveNoCache (pos) { return ResolvedPos.resolve(this, pos) };
 
   // :: (number, number, MarkType) → bool
   // Test whether a mark of the given type occurs in this document
   // between the two given positions.
-  Node$1.prototype.rangeHasMark = function rangeHasMark (from, to, type) {
+  Node.prototype.rangeHasMark = function rangeHasMark (from, to, type) {
     var found = false;
     if (to > from) { this.nodesBetween(from, to, function (node) {
       if (type.isInSet(node.marks)) { found = true; }
@@ -1391,7 +1391,7 @@
   // :: () → string
   // Return a string representation of this node for debugging
   // purposes.
-  Node$1.prototype.toString = function toString () {
+  Node.prototype.toString = function toString () {
     if (this.type.spec.toDebugString) { return this.type.spec.toDebugString(this) }
     var name = this.type.name;
     if (this.content.size)
@@ -1401,7 +1401,7 @@
 
   // :: (number) → ContentMatch
   // Get the content match in this node at the given index.
-  Node$1.prototype.contentMatchAt = function contentMatchAt (index) {
+  Node.prototype.contentMatchAt = function contentMatchAt (index) {
     var match = this.type.contentMatch.matchFragment(this.content, 0, index);
     if (!match) { throw new Error("Called contentMatchAt on a node with invalid content") }
     return match
@@ -1413,7 +1413,7 @@
   // to the empty fragment) would leave the node's content valid. You
   // can optionally pass `start` and `end` indices into the
   // replacement fragment.
-  Node$1.prototype.canReplace = function canReplace (from, to, replacement, start, end) {
+  Node.prototype.canReplace = function canReplace (from, to, replacement, start, end) {
       if ( replacement === void 0 ) replacement = Fragment.empty;
       if ( start === void 0 ) start = 0;
       if ( end === void 0 ) end = replacement.childCount;
@@ -1428,7 +1428,7 @@
   // :: (number, number, NodeType, ?[Mark]) → bool
   // Test whether replacing the range `from` to `to` (by index) with a
   // node of the given type would leave the node's content valid.
-  Node$1.prototype.canReplaceWith = function canReplaceWith (from, to, type, marks) {
+  Node.prototype.canReplaceWith = function canReplaceWith (from, to, type, marks) {
     if (marks && !this.type.allowsMarks(marks)) { return false }
     var start = this.contentMatchAt(from).matchType(type);
     var end = start && start.matchFragment(this.content, to);
@@ -1440,20 +1440,20 @@
   // node. If that node is empty, this will only return true if there
   // is at least one node type that can appear in both nodes (to avoid
   // merging completely incompatible nodes).
-  Node$1.prototype.canAppend = function canAppend (other) {
+  Node.prototype.canAppend = function canAppend (other) {
     if (other.content.size) { return this.canReplace(this.childCount, this.childCount, other.content) }
     else { return this.type.compatibleContent(other.type) }
   };
 
   // Unused. Left for backwards compatibility.
-  Node$1.prototype.defaultContentType = function defaultContentType (at) {
+  Node.prototype.defaultContentType = function defaultContentType (at) {
     return this.contentMatchAt(at).defaultType
   };
 
   // :: ()
   // Check whether this node and its descendants conform to the
   // schema, and raise error when they do not.
-  Node$1.prototype.check = function check () {
+  Node.prototype.check = function check () {
     if (!this.type.validContent(this.content))
       { throw new RangeError(("Invalid content for node " + (this.type.name) + ": " + (this.content.toString().slice(0, 50)))) }
     this.content.forEach(function (node) { return node.check(); });
@@ -1461,7 +1461,7 @@
 
   // :: () → Object
   // Return a JSON-serializeable representation of this node.
-  Node$1.prototype.toJSON = function toJSON () {
+  Node.prototype.toJSON = function toJSON () {
     var obj = {type: this.type.name};
     for (var _ in this.attrs) {
       obj.attrs = this.attrs;
@@ -1476,7 +1476,7 @@
 
   // :: (Schema, Object) → Node
   // Deserialize a node from its JSON representation.
-  Node$1.fromJSON = function fromJSON (schema, json) {
+  Node.fromJSON = function fromJSON (schema, json) {
     if (!json) { throw new RangeError("Invalid input for Node.fromJSON") }
     var marks = null;
     if (json.marks) {
@@ -1491,7 +1491,7 @@
     return schema.nodeType(json.type).create(json.attrs, content, marks)
   };
 
-  Object.defineProperties( Node$1.prototype, prototypeAccessors$3 );
+  Object.defineProperties( Node.prototype, prototypeAccessors$3 );
 
   var TextNode = /*@__PURE__*/(function (Node) {
     function TextNode(type, attrs, content, marks) {
@@ -1549,7 +1549,7 @@
     Object.defineProperties( TextNode.prototype, prototypeAccessors$1 );
 
     return TextNode;
-  }(Node$1));
+  }(Node));
 
   function wrapMarks(marks, str) {
     for (var i = marks.length - 1; i >= 0; i--)
@@ -2082,7 +2082,7 @@
   // set of marks.
   NodeType.prototype.create = function create (attrs, content, marks) {
     if (this.isText) { throw new Error("NodeType.create can't construct text nodes") }
-    return new Node$1(this, this.computeAttrs(attrs), Fragment.from(content), Mark.setFrom(marks))
+    return new Node(this, this.computeAttrs(attrs), Fragment.from(content), Mark.setFrom(marks))
   };
 
   // :: (?Object, ?union<Fragment, Node, [Node]>, ?[Mark]) → Node
@@ -2093,7 +2093,7 @@
     content = Fragment.from(content);
     if (!this.validContent(content))
       { throw new RangeError("Invalid content for node " + this.name) }
-    return new Node$1(this, this.computeAttrs(attrs), content, Mark.setFrom(marks))
+    return new Node(this, this.computeAttrs(attrs), content, Mark.setFrom(marks))
   };
 
   // :: (?Object, ?union<Fragment, Node, [Node]>, ?[Mark]) → ?Node
@@ -2113,7 +2113,7 @@
     }
     var after = this.contentMatch.matchFragment(content).fillBefore(Fragment.empty, true);
     if (!after) { return null }
-    return new Node$1(this, attrs, content.append(after), Mark.setFrom(marks))
+    return new Node(this, attrs, content.append(after), Mark.setFrom(marks))
   };
 
   // :: (Fragment) → bool
@@ -2504,7 +2504,7 @@
   // Deserialize a node from its JSON representation. This method is
   // bound.
   Schema.prototype.nodeFromJSON = function nodeFromJSON (json) {
-    return Node$1.fromJSON(this, json)
+    return Node.fromJSON(this, json)
   };
 
   // :: (Object) → Mark
@@ -6108,7 +6108,7 @@
     var instance = new EditorState($config);
     $config.fields.forEach(function (field) {
       if (field.name == "doc") {
-        instance.doc = Node$1.fromJSON(config.schema, json.doc);
+        instance.doc = Node.fromJSON(config.schema, json.doc);
       } else if (field.name == "selection") {
         instance.selection = Selection.fromJSON(instance.doc, json.selection);
       } else if (field.name == "storedMarks") {
@@ -11299,227 +11299,6 @@
   }
   //# sourceMappingURL=index.es.js.map
 
-  var base = {
-    8: "Backspace",
-    9: "Tab",
-    10: "Enter",
-    12: "NumLock",
-    13: "Enter",
-    16: "Shift",
-    17: "Control",
-    18: "Alt",
-    20: "CapsLock",
-    27: "Escape",
-    32: " ",
-    33: "PageUp",
-    34: "PageDown",
-    35: "End",
-    36: "Home",
-    37: "ArrowLeft",
-    38: "ArrowUp",
-    39: "ArrowRight",
-    40: "ArrowDown",
-    44: "PrintScreen",
-    45: "Insert",
-    46: "Delete",
-    59: ";",
-    61: "=",
-    91: "Meta",
-    92: "Meta",
-    106: "*",
-    107: "+",
-    108: ",",
-    109: "-",
-    110: ".",
-    111: "/",
-    144: "NumLock",
-    145: "ScrollLock",
-    160: "Shift",
-    161: "Shift",
-    162: "Control",
-    163: "Control",
-    164: "Alt",
-    165: "Alt",
-    173: "-",
-    186: ";",
-    187: "=",
-    188: ",",
-    189: "-",
-    190: ".",
-    191: "/",
-    192: "`",
-    219: "[",
-    220: "\\",
-    221: "]",
-    222: "'",
-    229: "q"
-  };
-  var base_1 = base;
-
-  var shift = {
-    48: ")",
-    49: "!",
-    50: "@",
-    51: "#",
-    52: "$",
-    53: "%",
-    54: "^",
-    55: "&",
-    56: "*",
-    57: "(",
-    59: ";",
-    61: "+",
-    173: "_",
-    186: ":",
-    187: "+",
-    188: "<",
-    189: "_",
-    190: ">",
-    191: "?",
-    192: "~",
-    219: "{",
-    220: "|",
-    221: "}",
-    222: "\"",
-    229: "Q"
-  };
-
-  var chrome$1 = typeof navigator != "undefined" && /Chrome\/(\d+)/.exec(navigator.userAgent);
-  var safari = typeof navigator != "undefined" && /Apple Computer/.test(navigator.vendor);
-  var gecko = typeof navigator != "undefined" && /Gecko\/\d+/.test(navigator.userAgent);
-  var mac = typeof navigator != "undefined" && /Mac/.test(navigator.platform);
-  var ie$1 = typeof navigator != "undefined" && /MSIE \d|Trident\/(?:[7-9]|\d{2,})\..*rv:(\d+)/.exec(navigator.userAgent);
-  var brokenModifierNames = chrome$1 && (mac || +chrome$1[1] < 57) || gecko && mac;
-
-  // Fill in the digit keys
-  for (var i = 0; i < 10; i++) base[48 + i] = base[96 + i] = String(i);
-
-  // The function keys
-  for (var i = 1; i <= 24; i++) base[i + 111] = "F" + i;
-
-  // And the alphabetic keys
-  for (var i = 65; i <= 90; i++) {
-    base[i] = String.fromCharCode(i + 32);
-    shift[i] = String.fromCharCode(i);
-  }
-
-  // For each code that doesn't have a shift-equivalent, copy the base name
-  for (var code in base) if (!shift.hasOwnProperty(code)) shift[code] = base[code];
-
-  var keyName = function(event) {
-    // Don't trust event.key in Chrome when there are modifiers until
-    // they fix https://bugs.chromium.org/p/chromium/issues/detail?id=633838
-    var ignoreKey = brokenModifierNames && (event.ctrlKey || event.altKey || event.metaKey) ||
-      (safari || ie$1) && event.shiftKey && event.key && event.key.length == 1;
-    var name = (!ignoreKey && event.key) ||
-      (event.shiftKey ? shift : base)[event.keyCode] ||
-      event.key || "Unidentified";
-    // Edge sometimes produces wrong names (Issue #3)
-    if (name == "Esc") name = "Escape";
-    if (name == "Del") name = "Delete";
-    // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/8860571/
-    if (name == "Left") name = "ArrowLeft";
-    if (name == "Up") name = "ArrowUp";
-    if (name == "Right") name = "ArrowRight";
-    if (name == "Down") name = "ArrowDown";
-    return name
-  };
-
-  // declare global: navigator
-
-  var mac$1 = typeof navigator != "undefined" ? /Mac/.test(navigator.platform) : false;
-
-  function normalizeKeyName(name) {
-    var parts = name.split(/-(?!$)/), result = parts[parts.length - 1];
-    if (result == "Space") { result = " "; }
-    var alt, ctrl, shift, meta;
-    for (var i = 0; i < parts.length - 1; i++) {
-      var mod = parts[i];
-      if (/^(cmd|meta|m)$/i.test(mod)) { meta = true; }
-      else if (/^a(lt)?$/i.test(mod)) { alt = true; }
-      else if (/^(c|ctrl|control)$/i.test(mod)) { ctrl = true; }
-      else if (/^s(hift)?$/i.test(mod)) { shift = true; }
-      else if (/^mod$/i.test(mod)) { if (mac$1) { meta = true; } else { ctrl = true; } }
-      else { throw new Error("Unrecognized modifier name: " + mod) }
-    }
-    if (alt) { result = "Alt-" + result; }
-    if (ctrl) { result = "Ctrl-" + result; }
-    if (meta) { result = "Meta-" + result; }
-    if (shift) { result = "Shift-" + result; }
-    return result
-  }
-
-  function normalize(map) {
-    var copy = Object.create(null);
-    for (var prop in map) { copy[normalizeKeyName(prop)] = map[prop]; }
-    return copy
-  }
-
-  function modifiers(name, event, shift) {
-    if (event.altKey) { name = "Alt-" + name; }
-    if (event.ctrlKey) { name = "Ctrl-" + name; }
-    if (event.metaKey) { name = "Meta-" + name; }
-    if (shift !== false && event.shiftKey) { name = "Shift-" + name; }
-    return name
-  }
-
-  // :: (Object) → Plugin
-  // Create a keymap plugin for the given set of bindings.
-  //
-  // Bindings should map key names to [command](#commands)-style
-  // functions, which will be called with `(EditorState, dispatch,
-  // EditorView)` arguments, and should return true when they've handled
-  // the key. Note that the view argument isn't part of the command
-  // protocol, but can be used as an escape hatch if a binding needs to
-  // directly interact with the UI.
-  //
-  // Key names may be strings like `"Shift-Ctrl-Enter"`—a key
-  // identifier prefixed with zero or more modifiers. Key identifiers
-  // are based on the strings that can appear in
-  // [`KeyEvent.key`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key).
-  // Use lowercase letters to refer to letter keys (or uppercase letters
-  // if you want shift to be held). You may use `"Space"` as an alias
-  // for the `" "` name.
-  //
-  // Modifiers can be given in any order. `Shift-` (or `s-`), `Alt-` (or
-  // `a-`), `Ctrl-` (or `c-` or `Control-`) and `Cmd-` (or `m-` or
-  // `Meta-`) are recognized. For characters that are created by holding
-  // shift, the `Shift-` prefix is implied, and should not be added
-  // explicitly.
-  //
-  // You can use `Mod-` as a shorthand for `Cmd-` on Mac and `Ctrl-` on
-  // other platforms.
-  //
-  // You can add multiple keymap plugins to an editor. The order in
-  // which they appear determines their precedence (the ones early in
-  // the array get to dispatch first).
-  function keymap(bindings) {
-    return new Plugin({props: {handleKeyDown: keydownHandler(bindings)}})
-  }
-
-  // :: (Object) → (view: EditorView, event: dom.Event) → bool
-  // Given a set of bindings (using the same format as
-  // [`keymap`](#keymap.keymap), return a [keydown
-  // handler](#view.EditorProps.handleKeyDown) that handles them.
-  function keydownHandler(bindings) {
-    var map = normalize(bindings);
-    return function(view, event) {
-      var name = keyName(event), isChar = name.length == 1 && name != " ", baseName;
-      var direct = map[modifiers(name, event, !isChar)];
-      if (direct && direct(view.state, view.dispatch, view)) { return true }
-      if (isChar && (event.shiftKey || event.altKey || event.metaKey) &&
-          (baseName = base_1[event.keyCode]) && baseName != name) {
-        var fromCode = map[modifiers(baseName, event, true)];
-        if (fromCode && fromCode(view.state, view.dispatch, view)) { return true }
-      } else if (isChar && event.shiftKey) {
-        var withShift = map[modifiers(name, event, true)];
-        if (withShift && withShift(view.state, view.dispatch, view)) { return true }
-      }
-      return false
-    }
-  }
-  //# sourceMappingURL=index.es.js.map
-
   var GOOD_LEAF_SIZE = 200;
 
   // :: class<T> A rope sequence is a persistent sequence data structure
@@ -12146,583 +11925,6 @@
   }
   //# sourceMappingURL=index.es.js.map
 
-  // :: (EditorState, ?(tr: Transaction)) → bool
-  // Delete the selection, if there is one.
-  function deleteSelection(state, dispatch) {
-    if (state.selection.empty) { return false }
-    if (dispatch) { dispatch(state.tr.deleteSelection().scrollIntoView()); }
-    return true
-  }
-
-  // :: (EditorState, ?(tr: Transaction), ?EditorView) → bool
-  // If the selection is empty and at the start of a textblock, try to
-  // reduce the distance between that block and the one before it—if
-  // there's a block directly before it that can be joined, join them.
-  // If not, try to move the selected block closer to the next one in
-  // the document structure by lifting it out of its parent or moving it
-  // into a parent of the previous block. Will use the view for accurate
-  // (bidi-aware) start-of-textblock detection if given.
-  function joinBackward(state, dispatch, view) {
-    var ref = state.selection;
-    var $cursor = ref.$cursor;
-    if (!$cursor || (view ? !view.endOfTextblock("backward", state)
-                          : $cursor.parentOffset > 0))
-      { return false }
-
-    var $cut = findCutBefore($cursor);
-
-    // If there is no node before this, try to lift
-    if (!$cut) {
-      var range = $cursor.blockRange(), target = range && liftTarget(range);
-      if (target == null) { return false }
-      if (dispatch) { dispatch(state.tr.lift(range, target).scrollIntoView()); }
-      return true
-    }
-
-    var before = $cut.nodeBefore;
-    // Apply the joining algorithm
-    if (!before.type.spec.isolating && deleteBarrier(state, $cut, dispatch))
-      { return true }
-
-    // If the node below has no content and the node above is
-    // selectable, delete the node below and select the one above.
-    if ($cursor.parent.content.size == 0 &&
-        (textblockAt(before, "end") || NodeSelection.isSelectable(before))) {
-      if (dispatch) {
-        var tr = state.tr.deleteRange($cursor.before(), $cursor.after());
-        tr.setSelection(textblockAt(before, "end") ? Selection.findFrom(tr.doc.resolve(tr.mapping.map($cut.pos, -1)), -1)
-                        : NodeSelection.create(tr.doc, $cut.pos - before.nodeSize));
-        dispatch(tr.scrollIntoView());
-      }
-      return true
-    }
-
-    // If the node before is an atom, delete it
-    if (before.isAtom && $cut.depth == $cursor.depth - 1) {
-      if (dispatch) { dispatch(state.tr.delete($cut.pos - before.nodeSize, $cut.pos).scrollIntoView()); }
-      return true
-    }
-
-    return false
-  }
-
-  function textblockAt(node, side) {
-    for (; node; node = (side == "start" ? node.firstChild : node.lastChild))
-      { if (node.isTextblock) { return true } }
-    return false
-  }
-
-  // :: (EditorState, ?(tr: Transaction), ?EditorView) → bool
-  // When the selection is empty and at the start of a textblock, select
-  // the node before that textblock, if possible. This is intended to be
-  // bound to keys like backspace, after
-  // [`joinBackward`](#commands.joinBackward) or other deleting
-  // commands, as a fall-back behavior when the schema doesn't allow
-  // deletion at the selected point.
-  function selectNodeBackward(state, dispatch, view) {
-    var ref = state.selection;
-    var $cursor = ref.$cursor;
-    if (!$cursor || (view ? !view.endOfTextblock("backward", state)
-                          : $cursor.parentOffset > 0))
-      { return false }
-
-    var $cut = findCutBefore($cursor), node = $cut && $cut.nodeBefore;
-    if (!node || !NodeSelection.isSelectable(node)) { return false }
-    if (dispatch)
-      { dispatch(state.tr.setSelection(NodeSelection.create(state.doc, $cut.pos - node.nodeSize)).scrollIntoView()); }
-    return true
-  }
-
-  function findCutBefore($pos) {
-    if (!$pos.parent.type.spec.isolating) { for (var i = $pos.depth - 1; i >= 0; i--) {
-      if ($pos.index(i) > 0) { return $pos.doc.resolve($pos.before(i + 1)) }
-      if ($pos.node(i).type.spec.isolating) { break }
-    } }
-    return null
-  }
-
-  // :: (EditorState, ?(tr: Transaction), ?EditorView) → bool
-  // If the selection is empty and the cursor is at the end of a
-  // textblock, try to reduce or remove the boundary between that block
-  // and the one after it, either by joining them or by moving the other
-  // block closer to this one in the tree structure. Will use the view
-  // for accurate start-of-textblock detection if given.
-  function joinForward(state, dispatch, view) {
-    var ref = state.selection;
-    var $cursor = ref.$cursor;
-    if (!$cursor || (view ? !view.endOfTextblock("forward", state)
-                          : $cursor.parentOffset < $cursor.parent.content.size))
-      { return false }
-
-    var $cut = findCutAfter($cursor);
-
-    // If there is no node after this, there's nothing to do
-    if (!$cut) { return false }
-
-    var after = $cut.nodeAfter;
-    // Try the joining algorithm
-    if (deleteBarrier(state, $cut, dispatch)) { return true }
-
-    // If the node above has no content and the node below is
-    // selectable, delete the node above and select the one below.
-    if ($cursor.parent.content.size == 0 &&
-        (textblockAt(after, "start") || NodeSelection.isSelectable(after))) {
-      if (dispatch) {
-        var tr = state.tr.deleteRange($cursor.before(), $cursor.after());
-        tr.setSelection(textblockAt(after, "start") ? Selection.findFrom(tr.doc.resolve(tr.mapping.map($cut.pos)), 1)
-                        : NodeSelection.create(tr.doc, tr.mapping.map($cut.pos)));
-        dispatch(tr.scrollIntoView());
-      }
-      return true
-    }
-
-    // If the next node is an atom, delete it
-    if (after.isAtom && $cut.depth == $cursor.depth - 1) {
-      if (dispatch) { dispatch(state.tr.delete($cut.pos, $cut.pos + after.nodeSize).scrollIntoView()); }
-      return true
-    }
-
-    return false
-  }
-
-  // :: (EditorState, ?(tr: Transaction), ?EditorView) → bool
-  // When the selection is empty and at the end of a textblock, select
-  // the node coming after that textblock, if possible. This is intended
-  // to be bound to keys like delete, after
-  // [`joinForward`](#commands.joinForward) and similar deleting
-  // commands, to provide a fall-back behavior when the schema doesn't
-  // allow deletion at the selected point.
-  function selectNodeForward(state, dispatch, view) {
-    var ref = state.selection;
-    var $cursor = ref.$cursor;
-    if (!$cursor || (view ? !view.endOfTextblock("forward", state)
-                          : $cursor.parentOffset < $cursor.parent.content.size))
-      { return false }
-
-    var $cut = findCutAfter($cursor), node = $cut && $cut.nodeAfter;
-    if (!node || !NodeSelection.isSelectable(node)) { return false }
-    if (dispatch)
-      { dispatch(state.tr.setSelection(NodeSelection.create(state.doc, $cut.pos)).scrollIntoView()); }
-    return true
-  }
-
-  function findCutAfter($pos) {
-    if (!$pos.parent.type.spec.isolating) { for (var i = $pos.depth - 1; i >= 0; i--) {
-      var parent = $pos.node(i);
-      if ($pos.index(i) + 1 < parent.childCount) { return $pos.doc.resolve($pos.after(i + 1)) }
-      if (parent.type.spec.isolating) { break }
-    } }
-    return null
-  }
-
-  // :: (EditorState, ?(tr: Transaction)) → bool
-  // Join the selected block or, if there is a text selection, the
-  // closest ancestor block of the selection that can be joined, with
-  // the sibling above it.
-  function joinUp(state, dispatch) {
-    var sel = state.selection, nodeSel = sel instanceof NodeSelection, point;
-    if (nodeSel) {
-      if (sel.node.isTextblock || !canJoin(state.doc, sel.from)) { return false }
-      point = sel.from;
-    } else {
-      point = joinPoint(state.doc, sel.from, -1);
-      if (point == null) { return false }
-    }
-    if (dispatch) {
-      var tr = state.tr.join(point);
-      if (nodeSel) { tr.setSelection(NodeSelection.create(tr.doc, point - state.doc.resolve(point).nodeBefore.nodeSize)); }
-      dispatch(tr.scrollIntoView());
-    }
-    return true
-  }
-
-  // :: (EditorState, ?(tr: Transaction)) → bool
-  // Join the selected block, or the closest ancestor of the selection
-  // that can be joined, with the sibling after it.
-  function joinDown(state, dispatch) {
-    var sel = state.selection, point;
-    if (sel instanceof NodeSelection) {
-      if (sel.node.isTextblock || !canJoin(state.doc, sel.to)) { return false }
-      point = sel.to;
-    } else {
-      point = joinPoint(state.doc, sel.to, 1);
-      if (point == null) { return false }
-    }
-    if (dispatch)
-      { dispatch(state.tr.join(point).scrollIntoView()); }
-    return true
-  }
-
-  // :: (EditorState, ?(tr: Transaction)) → bool
-  // Lift the selected block, or the closest ancestor block of the
-  // selection that can be lifted, out of its parent node.
-  function lift(state, dispatch) {
-    var ref = state.selection;
-    var $from = ref.$from;
-    var $to = ref.$to;
-    var range = $from.blockRange($to), target = range && liftTarget(range);
-    if (target == null) { return false }
-    if (dispatch) { dispatch(state.tr.lift(range, target).scrollIntoView()); }
-    return true
-  }
-
-  // :: (EditorState, ?(tr: Transaction)) → bool
-  // If the selection is in a node whose type has a truthy
-  // [`code`](#model.NodeSpec.code) property in its spec, replace the
-  // selection with a newline character.
-  function newlineInCode(state, dispatch) {
-    var ref = state.selection;
-    var $head = ref.$head;
-    var $anchor = ref.$anchor;
-    if (!$head.parent.type.spec.code || !$head.sameParent($anchor)) { return false }
-    if (dispatch) { dispatch(state.tr.insertText("\n").scrollIntoView()); }
-    return true
-  }
-
-  function defaultBlockAt(match) {
-    for (var i = 0; i < match.edgeCount; i++) {
-      var ref = match.edge(i);
-      var type = ref.type;
-      if (type.isTextblock && !type.hasRequiredAttrs()) { return type }
-    }
-    return null
-  }
-
-  // :: (EditorState, ?(tr: Transaction)) → bool
-  // When the selection is in a node with a truthy
-  // [`code`](#model.NodeSpec.code) property in its spec, create a
-  // default block after the code block, and move the cursor there.
-  function exitCode(state, dispatch) {
-    var ref = state.selection;
-    var $head = ref.$head;
-    var $anchor = ref.$anchor;
-    if (!$head.parent.type.spec.code || !$head.sameParent($anchor)) { return false }
-    var above = $head.node(-1), after = $head.indexAfter(-1), type = defaultBlockAt(above.contentMatchAt(after));
-    if (!above.canReplaceWith(after, after, type)) { return false }
-    if (dispatch) {
-      var pos = $head.after(), tr = state.tr.replaceWith(pos, pos, type.createAndFill());
-      tr.setSelection(Selection.near(tr.doc.resolve(pos), 1));
-      dispatch(tr.scrollIntoView());
-    }
-    return true
-  }
-
-  // :: (EditorState, ?(tr: Transaction)) → bool
-  // If a block node is selected, create an empty paragraph before (if
-  // it is its parent's first child) or after it.
-  function createParagraphNear(state, dispatch) {
-    var ref = state.selection;
-    var $from = ref.$from;
-    var $to = ref.$to;
-    if ($from.parent.inlineContent || $to.parent.inlineContent) { return false }
-    var type = defaultBlockAt($from.parent.contentMatchAt($to.indexAfter()));
-    if (!type || !type.isTextblock) { return false }
-    if (dispatch) {
-      var side = (!$from.parentOffset && $to.index() < $to.parent.childCount ? $from : $to).pos;
-      var tr = state.tr.insert(side, type.createAndFill());
-      tr.setSelection(TextSelection.create(tr.doc, side + 1));
-      dispatch(tr.scrollIntoView());
-    }
-    return true
-  }
-
-  // :: (EditorState, ?(tr: Transaction)) → bool
-  // If the cursor is in an empty textblock that can be lifted, lift the
-  // block.
-  function liftEmptyBlock(state, dispatch) {
-    var ref = state.selection;
-    var $cursor = ref.$cursor;
-    if (!$cursor || $cursor.parent.content.size) { return false }
-    if ($cursor.depth > 1 && $cursor.after() != $cursor.end(-1)) {
-      var before = $cursor.before();
-      if (canSplit(state.doc, before)) {
-        if (dispatch) { dispatch(state.tr.split(before).scrollIntoView()); }
-        return true
-      }
-    }
-    var range = $cursor.blockRange(), target = range && liftTarget(range);
-    if (target == null) { return false }
-    if (dispatch) { dispatch(state.tr.lift(range, target).scrollIntoView()); }
-    return true
-  }
-
-  // :: (EditorState, ?(tr: Transaction)) → bool
-  // Split the parent block of the selection. If the selection is a text
-  // selection, also delete its content.
-  function splitBlock(state, dispatch) {
-    var ref = state.selection;
-    var $from = ref.$from;
-    var $to = ref.$to;
-    if (state.selection instanceof NodeSelection && state.selection.node.isBlock) {
-      if (!$from.parentOffset || !canSplit(state.doc, $from.pos)) { return false }
-      if (dispatch) { dispatch(state.tr.split($from.pos).scrollIntoView()); }
-      return true
-    }
-
-    if (!$from.parent.isBlock) { return false }
-
-    if (dispatch) {
-      var atEnd = $to.parentOffset == $to.parent.content.size;
-      var tr = state.tr;
-      if (state.selection instanceof TextSelection) { tr.deleteSelection(); }
-      var deflt = $from.depth == 0 ? null : defaultBlockAt($from.node(-1).contentMatchAt($from.indexAfter(-1)));
-      var types = atEnd && deflt ? [{type: deflt}] : null;
-      var can = canSplit(tr.doc, tr.mapping.map($from.pos), 1, types);
-      if (!types && !can && canSplit(tr.doc, tr.mapping.map($from.pos), 1, deflt && [{type: deflt}])) {
-        types = [{type: deflt}];
-        can = true;
-      }
-      if (can) {
-        tr.split(tr.mapping.map($from.pos), 1, types);
-        if (!atEnd && !$from.parentOffset && $from.parent.type != deflt &&
-            $from.node(-1).canReplace($from.index(-1), $from.indexAfter(-1), Fragment.from(deflt.create(), $from.parent)))
-          { tr.setNodeMarkup(tr.mapping.map($from.before()), deflt); }
-      }
-      dispatch(tr.scrollIntoView());
-    }
-    return true
-  }
-
-  // :: (EditorState, ?(tr: Transaction)) → bool
-  // Move the selection to the node wrapping the current selection, if
-  // any. (Will not select the document node.)
-  function selectParentNode(state, dispatch) {
-    var ref = state.selection;
-    var $from = ref.$from;
-    var to = ref.to;
-    var pos;
-    var same = $from.sharedDepth(to);
-    if (same == 0) { return false }
-    pos = $from.before(same);
-    if (dispatch) { dispatch(state.tr.setSelection(NodeSelection.create(state.doc, pos))); }
-    return true
-  }
-
-  // :: (EditorState, ?(tr: Transaction)) → bool
-  // Select the whole document.
-  function selectAll(state, dispatch) {
-    if (dispatch) { dispatch(state.tr.setSelection(new AllSelection(state.doc))); }
-    return true
-  }
-
-  function joinMaybeClear(state, $pos, dispatch) {
-    var before = $pos.nodeBefore, after = $pos.nodeAfter, index = $pos.index();
-    if (!before || !after || !before.type.compatibleContent(after.type)) { return false }
-    if (!before.content.size && $pos.parent.canReplace(index - 1, index)) {
-      if (dispatch) { dispatch(state.tr.delete($pos.pos - before.nodeSize, $pos.pos).scrollIntoView()); }
-      return true
-    }
-    if (!$pos.parent.canReplace(index, index + 1) || !(after.isTextblock || canJoin(state.doc, $pos.pos)))
-      { return false }
-    if (dispatch)
-      { dispatch(state.tr
-               .clearIncompatible($pos.pos, before.type, before.contentMatchAt(before.childCount))
-               .join($pos.pos)
-               .scrollIntoView()); }
-    return true
-  }
-
-  function deleteBarrier(state, $cut, dispatch) {
-    var before = $cut.nodeBefore, after = $cut.nodeAfter, conn, match;
-    if (before.type.spec.isolating || after.type.spec.isolating) { return false }
-    if (joinMaybeClear(state, $cut, dispatch)) { return true }
-
-    if ($cut.parent.canReplace($cut.index(), $cut.index() + 1) &&
-        (conn = (match = before.contentMatchAt(before.childCount)).findWrapping(after.type)) &&
-        match.matchType(conn[0] || after.type).validEnd) {
-      if (dispatch) {
-        var end = $cut.pos + after.nodeSize, wrap = Fragment.empty;
-        for (var i = conn.length - 1; i >= 0; i--)
-          { wrap = Fragment.from(conn[i].create(null, wrap)); }
-        wrap = Fragment.from(before.copy(wrap));
-        var tr = state.tr.step(new ReplaceAroundStep($cut.pos - 1, end, $cut.pos, end, new Slice(wrap, 1, 0), conn.length, true));
-        var joinAt = end + 2 * conn.length;
-        if (canJoin(tr.doc, joinAt)) { tr.join(joinAt); }
-        dispatch(tr.scrollIntoView());
-      }
-      return true
-    }
-
-    var selAfter = Selection.findFrom($cut, 1);
-    var range = selAfter && selAfter.$from.blockRange(selAfter.$to), target = range && liftTarget(range);
-    if (target != null && target >= $cut.depth) {
-      if (dispatch) { dispatch(state.tr.lift(range, target).scrollIntoView()); }
-      return true
-    }
-
-    return false
-  }
-
-  // Parameterized commands
-
-  // :: (NodeType, ?Object) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
-  // Wrap the selection in a node of the given type with the given
-  // attributes.
-  function wrapIn(nodeType, attrs) {
-    return function(state, dispatch) {
-      var ref = state.selection;
-      var $from = ref.$from;
-      var $to = ref.$to;
-      var range = $from.blockRange($to), wrapping = range && findWrapping(range, nodeType, attrs);
-      if (!wrapping) { return false }
-      if (dispatch) { dispatch(state.tr.wrap(range, wrapping).scrollIntoView()); }
-      return true
-    }
-  }
-
-  // :: (NodeType, ?Object) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
-  // Returns a command that tries to set the selected textblocks to the
-  // given node type with the given attributes.
-  function setBlockType(nodeType, attrs) {
-    return function(state, dispatch) {
-      var ref = state.selection;
-      var from = ref.from;
-      var to = ref.to;
-      var applicable = false;
-      state.doc.nodesBetween(from, to, function (node, pos) {
-        if (applicable) { return false }
-        if (!node.isTextblock || node.hasMarkup(nodeType, attrs)) { return }
-        if (node.type == nodeType) {
-          applicable = true;
-        } else {
-          var $pos = state.doc.resolve(pos), index = $pos.index();
-          applicable = $pos.parent.canReplaceWith(index, index + 1, nodeType);
-        }
-      });
-      if (!applicable) { return false }
-      if (dispatch) { dispatch(state.tr.setBlockType(from, to, nodeType, attrs).scrollIntoView()); }
-      return true
-    }
-  }
-
-  function markApplies(doc, ranges, type) {
-    var loop = function ( i ) {
-      var ref = ranges[i];
-      var $from = ref.$from;
-      var $to = ref.$to;
-      var can = $from.depth == 0 ? doc.type.allowsMarkType(type) : false;
-      doc.nodesBetween($from.pos, $to.pos, function (node) {
-        if (can) { return false }
-        can = node.inlineContent && node.type.allowsMarkType(type);
-      });
-      if (can) { return { v: true } }
-    };
-
-    for (var i = 0; i < ranges.length; i++) {
-      var returned = loop( i );
-
-      if ( returned ) return returned.v;
-    }
-    return false
-  }
-
-  // :: (MarkType, ?Object) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
-  // Create a command function that toggles the given mark with the
-  // given attributes. Will return `false` when the current selection
-  // doesn't support that mark. This will remove the mark if any marks
-  // of that type exist in the selection, or add it otherwise. If the
-  // selection is empty, this applies to the [stored
-  // marks](#state.EditorState.storedMarks) instead of a range of the
-  // document.
-  function toggleMark(markType, attrs) {
-    return function(state, dispatch) {
-      var ref = state.selection;
-      var empty = ref.empty;
-      var $cursor = ref.$cursor;
-      var ranges = ref.ranges;
-      if ((empty && !$cursor) || !markApplies(state.doc, ranges, markType)) { return false }
-      if (dispatch) {
-        if ($cursor) {
-          if (markType.isInSet(state.storedMarks || $cursor.marks()))
-            { dispatch(state.tr.removeStoredMark(markType)); }
-          else
-            { dispatch(state.tr.addStoredMark(markType.create(attrs))); }
-        } else {
-          var has = false, tr = state.tr;
-          for (var i = 0; !has && i < ranges.length; i++) {
-            var ref$1 = ranges[i];
-            var $from = ref$1.$from;
-            var $to = ref$1.$to;
-            has = state.doc.rangeHasMark($from.pos, $to.pos, markType);
-          }
-          for (var i$1 = 0; i$1 < ranges.length; i$1++) {
-            var ref$2 = ranges[i$1];
-            var $from$1 = ref$2.$from;
-            var $to$1 = ref$2.$to;
-            if (has) { tr.removeMark($from$1.pos, $to$1.pos, markType); }
-            else { tr.addMark($from$1.pos, $to$1.pos, markType.create(attrs)); }
-          }
-          dispatch(tr.scrollIntoView());
-        }
-      }
-      return true
-    }
-  }
-
-  // :: (...[(EditorState, ?(tr: Transaction), ?EditorView) → bool]) → (EditorState, ?(tr: Transaction), ?EditorView) → bool
-  // Combine a number of command functions into a single function (which
-  // calls them one by one until one returns true).
-  function chainCommands() {
-    var commands = [], len = arguments.length;
-    while ( len-- ) commands[ len ] = arguments[ len ];
-
-    return function(state, dispatch, view) {
-      for (var i = 0; i < commands.length; i++)
-        { if (commands[i](state, dispatch, view)) { return true } }
-      return false
-    }
-  }
-
-  var backspace = chainCommands(deleteSelection, joinBackward, selectNodeBackward);
-  var del = chainCommands(deleteSelection, joinForward, selectNodeForward);
-
-  // :: Object
-  // A basic keymap containing bindings not specific to any schema.
-  // Binds the following keys (when multiple commands are listed, they
-  // are chained with [`chainCommands`](#commands.chainCommands)):
-  //
-  // * **Enter** to `newlineInCode`, `createParagraphNear`, `liftEmptyBlock`, `splitBlock`
-  // * **Mod-Enter** to `exitCode`
-  // * **Backspace** and **Mod-Backspace** to `deleteSelection`, `joinBackward`, `selectNodeBackward`
-  // * **Delete** and **Mod-Delete** to `deleteSelection`, `joinForward`, `selectNodeForward`
-  // * **Mod-Delete** to `deleteSelection`, `joinForward`, `selectNodeForward`
-  // * **Mod-a** to `selectAll`
-  var pcBaseKeymap = {
-    "Enter": chainCommands(newlineInCode, createParagraphNear, liftEmptyBlock, splitBlock),
-    "Mod-Enter": exitCode,
-    "Backspace": backspace,
-    "Mod-Backspace": backspace,
-    "Delete": del,
-    "Mod-Delete": del,
-    "Mod-a": selectAll
-  };
-
-  // :: Object
-  // A copy of `pcBaseKeymap` that also binds **Ctrl-h** like Backspace,
-  // **Ctrl-d** like Delete, **Alt-Backspace** like Ctrl-Backspace, and
-  // **Ctrl-Alt-Backspace**, **Alt-Delete**, and **Alt-d** like
-  // Ctrl-Delete.
-  var macBaseKeymap = {
-    "Ctrl-h": pcBaseKeymap["Backspace"],
-    "Alt-Backspace": pcBaseKeymap["Mod-Backspace"],
-    "Ctrl-d": pcBaseKeymap["Delete"],
-    "Ctrl-Alt-Backspace": pcBaseKeymap["Mod-Delete"],
-    "Alt-Delete": pcBaseKeymap["Mod-Delete"],
-    "Alt-d": pcBaseKeymap["Mod-Delete"]
-  };
-  for (var key in pcBaseKeymap) { macBaseKeymap[key] = pcBaseKeymap[key]; }
-
-  // declare global: os, navigator
-  var mac$2 = typeof navigator != "undefined" ? /Mac/.test(navigator.platform)
-            : typeof os != "undefined" ? os.platform() == "darwin" : false;
-
-  // :: Object
-  // Depending on the detected platform, this will hold
-  // [`pcBasekeymap`](#commands.pcBaseKeymap) or
-  // [`macBaseKeymap`](#commands.macBaseKeymap).
-  var baseKeymap = mac$2 ? macBaseKeymap : pcBaseKeymap;
-  //# sourceMappingURL=index.es.js.map
-
   // :: (options: ?Object) → Plugin
   // Create a plugin that, when added to a ProseMirror instance,
   // causes a decoration to show up at the drop position when something
@@ -12854,6 +12056,193 @@
     if (event.target == this.editorView.dom || !this.editorView.dom.contains(event.relatedTarget))
       { this.setCursor(null); }
   };
+  //# sourceMappingURL=index.es.js.map
+
+  var base = {
+    8: "Backspace",
+    9: "Tab",
+    10: "Enter",
+    12: "NumLock",
+    13: "Enter",
+    16: "Shift",
+    17: "Control",
+    18: "Alt",
+    20: "CapsLock",
+    27: "Escape",
+    32: " ",
+    33: "PageUp",
+    34: "PageDown",
+    35: "End",
+    36: "Home",
+    37: "ArrowLeft",
+    38: "ArrowUp",
+    39: "ArrowRight",
+    40: "ArrowDown",
+    44: "PrintScreen",
+    45: "Insert",
+    46: "Delete",
+    59: ";",
+    61: "=",
+    91: "Meta",
+    92: "Meta",
+    106: "*",
+    107: "+",
+    108: ",",
+    109: "-",
+    110: ".",
+    111: "/",
+    144: "NumLock",
+    145: "ScrollLock",
+    160: "Shift",
+    161: "Shift",
+    162: "Control",
+    163: "Control",
+    164: "Alt",
+    165: "Alt",
+    173: "-",
+    186: ";",
+    187: "=",
+    188: ",",
+    189: "-",
+    190: ".",
+    191: "/",
+    192: "`",
+    219: "[",
+    220: "\\",
+    221: "]",
+    222: "'",
+    229: "q"
+  };
+  var base_1 = base;
+
+  var shift = {
+    48: ")",
+    49: "!",
+    50: "@",
+    51: "#",
+    52: "$",
+    53: "%",
+    54: "^",
+    55: "&",
+    56: "*",
+    57: "(",
+    59: ";",
+    61: "+",
+    173: "_",
+    186: ":",
+    187: "+",
+    188: "<",
+    189: "_",
+    190: ">",
+    191: "?",
+    192: "~",
+    219: "{",
+    220: "|",
+    221: "}",
+    222: "\"",
+    229: "Q"
+  };
+
+  var chrome$1 = typeof navigator != "undefined" && /Chrome\/(\d+)/.exec(navigator.userAgent);
+  var safari = typeof navigator != "undefined" && /Apple Computer/.test(navigator.vendor);
+  var gecko = typeof navigator != "undefined" && /Gecko\/\d+/.test(navigator.userAgent);
+  var mac = typeof navigator != "undefined" && /Mac/.test(navigator.platform);
+  var ie$1 = typeof navigator != "undefined" && /MSIE \d|Trident\/(?:[7-9]|\d{2,})\..*rv:(\d+)/.exec(navigator.userAgent);
+  var brokenModifierNames = chrome$1 && (mac || +chrome$1[1] < 57) || gecko && mac;
+
+  // Fill in the digit keys
+  for (var i = 0; i < 10; i++) base[48 + i] = base[96 + i] = String(i);
+
+  // The function keys
+  for (var i = 1; i <= 24; i++) base[i + 111] = "F" + i;
+
+  // And the alphabetic keys
+  for (var i = 65; i <= 90; i++) {
+    base[i] = String.fromCharCode(i + 32);
+    shift[i] = String.fromCharCode(i);
+  }
+
+  // For each code that doesn't have a shift-equivalent, copy the base name
+  for (var code in base) if (!shift.hasOwnProperty(code)) shift[code] = base[code];
+
+  var keyName = function(event) {
+    // Don't trust event.key in Chrome when there are modifiers until
+    // they fix https://bugs.chromium.org/p/chromium/issues/detail?id=633838
+    var ignoreKey = brokenModifierNames && (event.ctrlKey || event.altKey || event.metaKey) ||
+      (safari || ie$1) && event.shiftKey && event.key && event.key.length == 1;
+    var name = (!ignoreKey && event.key) ||
+      (event.shiftKey ? shift : base)[event.keyCode] ||
+      event.key || "Unidentified";
+    // Edge sometimes produces wrong names (Issue #3)
+    if (name == "Esc") name = "Escape";
+    if (name == "Del") name = "Delete";
+    // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/8860571/
+    if (name == "Left") name = "ArrowLeft";
+    if (name == "Up") name = "ArrowUp";
+    if (name == "Right") name = "ArrowRight";
+    if (name == "Down") name = "ArrowDown";
+    return name
+  };
+
+  // declare global: navigator
+
+  var mac$1 = typeof navigator != "undefined" ? /Mac/.test(navigator.platform) : false;
+
+  function normalizeKeyName(name) {
+    var parts = name.split(/-(?!$)/), result = parts[parts.length - 1];
+    if (result == "Space") { result = " "; }
+    var alt, ctrl, shift, meta;
+    for (var i = 0; i < parts.length - 1; i++) {
+      var mod = parts[i];
+      if (/^(cmd|meta|m)$/i.test(mod)) { meta = true; }
+      else if (/^a(lt)?$/i.test(mod)) { alt = true; }
+      else if (/^(c|ctrl|control)$/i.test(mod)) { ctrl = true; }
+      else if (/^s(hift)?$/i.test(mod)) { shift = true; }
+      else if (/^mod$/i.test(mod)) { if (mac$1) { meta = true; } else { ctrl = true; } }
+      else { throw new Error("Unrecognized modifier name: " + mod) }
+    }
+    if (alt) { result = "Alt-" + result; }
+    if (ctrl) { result = "Ctrl-" + result; }
+    if (meta) { result = "Meta-" + result; }
+    if (shift) { result = "Shift-" + result; }
+    return result
+  }
+
+  function normalize(map) {
+    var copy = Object.create(null);
+    for (var prop in map) { copy[normalizeKeyName(prop)] = map[prop]; }
+    return copy
+  }
+
+  function modifiers(name, event, shift) {
+    if (event.altKey) { name = "Alt-" + name; }
+    if (event.ctrlKey) { name = "Ctrl-" + name; }
+    if (event.metaKey) { name = "Meta-" + name; }
+    if (shift !== false && event.shiftKey) { name = "Shift-" + name; }
+    return name
+  }
+
+  // :: (Object) → (view: EditorView, event: dom.Event) → bool
+  // Given a set of bindings (using the same format as
+  // [`keymap`](#keymap.keymap), return a [keydown
+  // handler](#view.EditorProps.handleKeyDown) that handles them.
+  function keydownHandler(bindings) {
+    var map = normalize(bindings);
+    return function(view, event) {
+      var name = keyName(event), isChar = name.length == 1 && name != " ", baseName;
+      var direct = map[modifiers(name, event, !isChar)];
+      if (direct && direct(view.state, view.dispatch, view)) { return true }
+      if (isChar && (event.shiftKey || event.altKey || event.metaKey) &&
+          (baseName = base_1[event.keyCode]) && baseName != name) {
+        var fromCode = map[modifiers(baseName, event, true)];
+        if (fromCode && fromCode(view.state, view.dispatch, view)) { return true }
+      } else if (isChar && event.shiftKey) {
+        var withShift = map[modifiers(name, event, true)];
+        if (withShift && withShift(view.state, view.dispatch, view)) { return true }
+      }
+      return false
+    }
+  }
   //# sourceMappingURL=index.es.js.map
 
   // ::- Gap cursor selections are represented using this class. Its
@@ -13039,1257 +12428,629 @@
   }
   //# sourceMappingURL=index.es.js.map
 
-  var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+  // :: (EditorState, ?(tr: Transaction)) → bool
+  // Delete the selection, if there is one.
 
-  function createCommonjsModule(fn, module) {
-  	return module = { exports: {} }, fn(module, module.exports), module.exports;
+  function deleteSelection(state, dispatch) {
+      if (state.selection.empty) return false
+      if (dispatch) dispatch(state.tr.deleteSelection().scrollIntoView());
+      return true
   }
 
-  var crel = createCommonjsModule(function (module, exports) {
-  //Copyright (C) 2012 Kory Nunn
+  // :: (EditorState, ?(tr: Transaction), ?EditorView) → bool
+  // If the selection is empty and at the start of a textblock, try to
+  // reduce the distance between that block and the one before it—if
+  // there's a block directly before it that can be joined, join them.
+  // If not, try to move the selected block closer to the next one in
+  // the document structure by lifting it out of its parent or moving it
+  // into a parent of the previous block. Will use the view for accurate
+  // (bidi-aware) start-of-textblock detection if given.
+  function joinBackward(state, dispatch, view) {
+      let {
+          $cursor
+      } = state.selection;
+      if (!$cursor || (view ? !view.endOfTextblock("backward", state) :
+              $cursor.parentOffset > 0))
+          return false
 
-  //Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+      let $cut = findCutBefore($cursor);
 
-  //The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-  //THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-  /*
-
-      This code is not formatted for readability, but rather run-speed and to assist compilers.
-
-      However, the code's intention should be transparent.
-
-      *** IE SUPPORT ***
-
-      If you require this library to work in IE7, add the following after declaring crel.
-
-      var testDiv = document.createElement('div'),
-          testLabel = document.createElement('label');
-
-      testDiv.setAttribute('class', 'a');
-      testDiv['className'] !== 'a' ? crel.attrMap['class'] = 'className':undefined;
-      testDiv.setAttribute('name','a');
-      testDiv['name'] !== 'a' ? crel.attrMap['name'] = function(element, value){
-          element.id = value;
-      }:undefined;
-
-
-      testLabel.setAttribute('for', 'a');
-      testLabel['htmlFor'] !== 'a' ? crel.attrMap['for'] = 'htmlFor':undefined;
-
-
-
-  */
-
-  (function (root, factory) {
-      {
-          module.exports = factory();
+      // If there is no node before this, try to lift
+      if (!$cut) {
+          let range = $cursor.blockRange(),
+              target = range && liftTarget(range);
+          if (target == null) return false
+          if (dispatch) dispatch(state.tr.lift(range, target).scrollIntoView());
+          return true
       }
-  }(commonjsGlobal, function () {
-      var fn = 'function',
-          obj = 'object',
-          nodeType = 'nodeType',
-          textContent = 'textContent',
-          setAttribute = 'setAttribute',
-          attrMapString = 'attrMap',
-          isNodeString = 'isNode',
-          isElementString = 'isElement',
-          d = typeof document === obj ? document : {},
-          isType = function(a, type){
-              return typeof a === type;
-          },
-          isNode = typeof Node === fn ? function (object) {
-              return object instanceof Node;
-          } :
-          // in IE <= 8 Node is an object, obviously..
-          function(object){
-              return object &&
-                  isType(object, obj) &&
-                  (nodeType in object) &&
-                  isType(object.ownerDocument,obj);
-          },
-          isElement = function (object) {
-              return crel[isNodeString](object) && object[nodeType] === 1;
-          },
-          isArray = function(a){
-              return a instanceof Array;
-          },
-          appendChild = function(element, child) {
-              if (isArray(child)) {
-                  child.map(function(subChild){
-                      appendChild(element, subChild);
-                  });
+
+      let before = $cut.nodeBefore;
+      // Apply the joining algorithm
+      if (!before.type.spec.isolating && deleteBarrier(state, $cut, dispatch))
+          return true
+
+      // If the node below has no content and the node above is
+      // selectable, delete the node below and select the one above.
+      if ($cursor.parent.content.size == 0 &&
+          (textblockAt(before, "end") || NodeSelection.isSelectable(before))) {
+          if (dispatch) {
+              let tr = state.tr.deleteRange($cursor.before(), $cursor.after());
+              tr.setSelection(textblockAt(before, "end") ? Selection.findFrom(tr.doc.resolve(tr.mapping.map($cut.pos, -1)), -1) :
+                  NodeSelection.create(tr.doc, $cut.pos - before.nodeSize));
+              dispatch(tr.scrollIntoView());
+          }
+          return true
+      }
+
+      // If the node before is an atom, delete it
+      if (before.isAtom && $cut.depth == $cursor.depth - 1) {
+          if (dispatch) dispatch(state.tr.delete($cut.pos - before.nodeSize, $cut.pos).scrollIntoView());
+          return true
+      }
+
+      return false
+  }
+
+  function textblockAt(node, side) {
+      for (; node; node = (side == "start" ? node.firstChild : node.lastChild))
+          if (node.isTextblock) return true
+      return false
+  }
+
+  // :: (EditorState, ?(tr: Transaction), ?EditorView) → bool
+  // When the selection is empty and at the start of a textblock, select
+  // the node before that textblock, if possible. This is intended to be
+  // bound to keys like backspace, after
+  // [`joinBackward`](#commands.joinBackward) or other deleting
+  // commands, as a fall-back behavior when the schema doesn't allow
+  // deletion at the selected point.
+  function selectNodeBackward(state, dispatch, view) {
+      let {
+          $cursor
+      } = state.selection;
+      if (!$cursor || (view ? !view.endOfTextblock("backward", state) :
+              $cursor.parentOffset > 0))
+          return false
+
+      let $cut = findCutBefore($cursor),
+          node = $cut && $cut.nodeBefore;
+      if (!node || !NodeSelection.isSelectable(node)) return false
+      if (dispatch)
+          dispatch(state.tr.setSelection(NodeSelection.create(state.doc, $cut.pos - node.nodeSize)).scrollIntoView());
+      return true
+  }
+
+  function findCutBefore($pos) {
+      if (!$pos.parent.type.spec.isolating)
+          for (let i = $pos.depth - 1; i >= 0; i--) {
+              if ($pos.index(i) > 0) return $pos.doc.resolve($pos.before(i + 1))
+              if ($pos.node(i).type.spec.isolating) break
+          }
+      return null
+  }
+
+  // :: (EditorState, ?(tr: Transaction), ?EditorView) → bool
+  // If the selection is empty and the cursor is at the end of a
+  // textblock, try to reduce or remove the boundary between that block
+  // and the one after it, either by joining them or by moving the other
+  // block closer to this one in the tree structure. Will use the view
+  // for accurate start-of-textblock detection if given.
+  function joinForward(state, dispatch, view) {
+      let {
+          $cursor
+      } = state.selection;
+      if (!$cursor || (view ? !view.endOfTextblock("forward", state) :
+              $cursor.parentOffset < $cursor.parent.content.size))
+          return false
+
+      let $cut = findCutAfter($cursor);
+
+      // If there is no node after this, there's nothing to do
+      if (!$cut) return false
+
+      let after = $cut.nodeAfter;
+      // Try the joining algorithm
+      if (deleteBarrier(state, $cut, dispatch)) return true
+
+      // If the node above has no content and the node below is
+      // selectable, delete the node above and select the one below.
+      if ($cursor.parent.content.size == 0 &&
+          (textblockAt(after, "start") || NodeSelection.isSelectable(after))) {
+          if (dispatch) {
+              let tr = state.tr.deleteRange($cursor.before(), $cursor.after());
+              tr.setSelection(textblockAt(after, "start") ? Selection.findFrom(tr.doc.resolve(tr.mapping.map($cut.pos)), 1) :
+                  NodeSelection.create(tr.doc, tr.mapping.map($cut.pos)));
+              dispatch(tr.scrollIntoView());
+          }
+          return true
+      }
+
+      // If the next node is an atom, delete it
+      if (after.isAtom && $cut.depth == $cursor.depth - 1) {
+          if (dispatch) dispatch(state.tr.delete($cut.pos, $cut.pos + after.nodeSize).scrollIntoView());
+          return true
+      }
+
+      return false
+  }
+
+  // :: (EditorState, ?(tr: Transaction), ?EditorView) → bool
+  // When the selection is empty and at the end of a textblock, select
+  // the node coming after that textblock, if possible. This is intended
+  // to be bound to keys like delete, after
+  // [`joinForward`](#commands.joinForward) and similar deleting
+  // commands, to provide a fall-back behavior when the schema doesn't
+  // allow deletion at the selected point.
+  function selectNodeForward(state, dispatch, view) {
+      let {
+          $cursor
+      } = state.selection;
+      if (!$cursor || (view ? !view.endOfTextblock("forward", state) :
+              $cursor.parentOffset < $cursor.parent.content.size))
+          return false
+
+      let $cut = findCutAfter($cursor),
+          node = $cut && $cut.nodeAfter;
+      if (!node || !NodeSelection.isSelectable(node)) return false
+      if (dispatch)
+          dispatch(state.tr.setSelection(NodeSelection.create(state.doc, $cut.pos)).scrollIntoView());
+      return true
+  }
+
+  function findCutAfter($pos) {
+      if (!$pos.parent.type.spec.isolating)
+          for (let i = $pos.depth - 1; i >= 0; i--) {
+              let parent = $pos.node(i);
+              if ($pos.index(i) + 1 < parent.childCount) return $pos.doc.resolve($pos.after(i + 1))
+              if (parent.type.spec.isolating) break
+          }
+      return null
+  }
+
+  // :: (EditorState, ?(tr: Transaction)) → bool
+  // Join the selected block or, if there is a text selection, the
+  // closest ancestor block of the selection that can be joined, with
+  // the sibling above it.
+  function joinUp(state, dispatch) {
+      let sel = state.selection,
+          nodeSel = sel instanceof NodeSelection,
+          point;
+      if (nodeSel) {
+          if (sel.node.isTextblock || !canJoin(state.doc, sel.from)) return false
+          point = sel.from;
+      } else {
+          point = joinPoint(state.doc, sel.from, -1);
+          if (point == null) return false
+      }
+      if (dispatch) {
+          let tr = state.tr.join(point);
+          if (nodeSel) tr.setSelection(NodeSelection.create(tr.doc, point - state.doc.resolve(point).nodeBefore.nodeSize));
+          dispatch(tr.scrollIntoView());
+      }
+      return true
+  }
+
+  // :: (EditorState, ?(tr: Transaction)) → bool
+  // Join the selected block, or the closest ancestor of the selection
+  // that can be joined, with the sibling after it.
+  function joinDown(state, dispatch) {
+      let sel = state.selection,
+          point;
+      if (sel instanceof NodeSelection) {
+          if (sel.node.isTextblock || !canJoin(state.doc, sel.to)) return false
+          point = sel.to;
+      } else {
+          point = joinPoint(state.doc, sel.to, 1);
+          if (point == null) return false
+      }
+      if (dispatch)
+          dispatch(state.tr.join(point).scrollIntoView());
+      return true
+  }
+
+  // :: (EditorState, ?(tr: Transaction)) → bool
+  // Lift the selected block, or the closest ancestor block of the
+  // selection that can be lifted, out of its parent node.
+  function lift(state, dispatch) {
+      let {
+          $from,
+          $to
+      } = state.selection;
+      let range = $from.blockRange($to),
+          target = range && liftTarget(range);
+      if (target == null) return false
+      if (dispatch) dispatch(state.tr.lift(range, target).scrollIntoView());
+      return true
+  }
+
+  // :: (EditorState, ?(tr: Transaction)) → bool
+  // If the selection is in a node whose type has a truthy
+  // [`code`](#model.NodeSpec.code) property in its spec, replace the
+  // selection with a newline character.
+  function newlineInCode(state, dispatch) {
+      let {
+          $head,
+          $anchor
+      } = state.selection;
+      if (!$head.parent.type.spec.code || !$head.sameParent($anchor)) return false
+      if (dispatch) dispatch(state.tr.insertText("\n").scrollIntoView());
+      return true
+  }
+
+  function defaultBlockAt(match) {
+      for (let i = 0; i < match.edgeCount; i++) {
+          let {
+              type
+          } = match.edge(i);
+          if (type.isTextblock && !type.hasRequiredAttrs()) return type
+      }
+      return null
+  }
+
+  // :: (EditorState, ?(tr: Transaction)) → bool
+  // When the selection is in a node with a truthy
+  // [`code`](#model.NodeSpec.code) property in its spec, create a
+  // default block after the code block, and move the cursor there.
+  function exitCode(state, dispatch) {
+      let {
+          $head,
+          $anchor
+      } = state.selection;
+      if (!$head.parent.type.spec.code || !$head.sameParent($anchor)) return false
+      let above = $head.node(-1),
+          after = $head.indexAfter(-1),
+          type = defaultBlockAt(above.contentMatchAt(after));
+      if (!above.canReplaceWith(after, after, type)) return false
+      if (dispatch) {
+          let pos = $head.after(),
+              tr = state.tr.replaceWith(pos, pos, type.createAndFill());
+          tr.setSelection(Selection.near(tr.doc.resolve(pos), 1));
+          dispatch(tr.scrollIntoView());
+      }
+      return true
+  }
+
+  // :: (EditorState, ?(tr: Transaction)) → bool
+  // If a block node is selected, create an empty paragraph before (if
+  // it is its parent's first child) or after it.
+  function createParagraphNear(state, dispatch) {
+      let {
+          $from,
+          $to
+      } = state.selection;
+      if ($from.parent.inlineContent || $to.parent.inlineContent) return false
+      let type = defaultBlockAt($from.parent.contentMatchAt($to.indexAfter()));
+      if (!type || !type.isTextblock) return false
+      if (dispatch) {
+          let side = (!$from.parentOffset && $to.index() < $to.parent.childCount ? $from : $to).pos;
+          let tr = state.tr.insert(side, type.createAndFill());
+          tr.setSelection(TextSelection.create(tr.doc, side + 1));
+          dispatch(tr.scrollIntoView());
+      }
+      return true
+  }
+
+  // :: (EditorState, ?(tr: Transaction)) → bool
+  // If the cursor is in an empty textblock that can be lifted, lift the
+  // block.
+  function liftEmptyBlock(state, dispatch) {
+      let {
+          $cursor
+      } = state.selection;
+      if (!$cursor || $cursor.parent.content.size) return false
+      if ($cursor.depth > 1 && $cursor.after() != $cursor.end(-1)) {
+          let before = $cursor.before();
+          if (canSplit(state.doc, before)) {
+              if (dispatch) dispatch(state.tr.split(before).scrollIntoView());
+              return true
+          }
+      }
+      let range = $cursor.blockRange(),
+          target = range && liftTarget(range);
+      if (target == null) return false
+      if (dispatch) dispatch(state.tr.lift(range, target).scrollIntoView());
+      return true
+  }
+
+  // :: (EditorState, ?(tr: Transaction)) → bool
+  // Split the parent block of the selection. If the selection is a text
+  // selection, also delete its content.
+  function splitBlock(state, dispatch) {
+      let {
+          $from,
+          $to
+      } = state.selection;
+      if (state.selection instanceof NodeSelection && state.selection.node.isBlock) {
+          if (!$from.parentOffset || !canSplit(state.doc, $from.pos)) return false
+          if (dispatch) dispatch(state.tr.split($from.pos).scrollIntoView());
+          return true
+      }
+
+      if (!$from.parent.isBlock) return false
+
+      if (dispatch) {
+          let atEnd = $to.parentOffset == $to.parent.content.size;
+          let tr = state.tr;
+          if (state.selection instanceof TextSelection) tr.deleteSelection();
+          let deflt = $from.depth == 0 ? null : defaultBlockAt($from.node(-1).contentMatchAt($from.indexAfter(-1)));
+          let types = atEnd && deflt ? [{
+              type: deflt
+          }] : null;
+          let can = canSplit(tr.doc, tr.mapping.map($from.pos), 1, types);
+          if (!types && !can && canSplit(tr.doc, tr.mapping.map($from.pos), 1, deflt && [{
+                  type: deflt
+              }])) {
+              types = [{
+                  type: deflt
+              }];
+              can = true;
+          }
+          if (can) {
+              tr.split(tr.mapping.map($from.pos), 1, types);
+              if (!atEnd && !$from.parentOffset && $from.parent.type != deflt &&
+                  $from.node(-1).canReplace($from.index(-1), $from.indexAfter(-1), Fragment.from(deflt.create(), $from.parent)))
+                  tr.setNodeMarkup(tr.mapping.map($from.before()), deflt);
+          }
+          dispatch(tr.scrollIntoView());
+      }
+      return true
+  }
+
+  // :: (EditorState, ?(tr: Transaction)) → bool
+  // Move the selection to the node wrapping the current selection, if
+  // any. (Will not select the document node.)
+  function selectParentNode(state, dispatch) {
+      let {
+          $from,
+          to
+      } = state.selection, pos;
+      let same = $from.sharedDepth(to);
+      if (same == 0) return false
+      pos = $from.before(same);
+      if (dispatch) dispatch(state.tr.setSelection(NodeSelection.create(state.doc, pos)));
+      return true
+  }
+
+  // :: (EditorState, ?(tr: Transaction)) → bool
+  // Select the whole document.
+  function selectAll(state, dispatch) {
+      if (dispatch) dispatch(state.tr.setSelection(new AllSelection(state.doc)));
+      return true
+  }
+
+  function joinMaybeClear(state, $pos, dispatch) {
+      let before = $pos.nodeBefore,
+          after = $pos.nodeAfter,
+          index = $pos.index();
+      if (!before || !after || !before.type.compatibleContent(after.type)) return false
+      if (!before.content.size && $pos.parent.canReplace(index - 1, index)) {
+          if (dispatch) dispatch(state.tr.delete($pos.pos - before.nodeSize, $pos.pos).scrollIntoView());
+          return true
+      }
+      if (!$pos.parent.canReplace(index, index + 1) || !(after.isTextblock || canJoin(state.doc, $pos.pos)))
+          return false
+      if (dispatch)
+          dispatch(state.tr
+              .clearIncompatible($pos.pos, before.type, before.contentMatchAt(before.childCount))
+              .join($pos.pos)
+              .scrollIntoView());
+      return true
+  }
+
+  function deleteBarrier(state, $cut, dispatch) {
+      let before = $cut.nodeBefore,
+          after = $cut.nodeAfter,
+          conn, match;
+      if (before.type.spec.isolating || after.type.spec.isolating) return false
+      if (joinMaybeClear(state, $cut, dispatch)) return true
+
+      if ($cut.parent.canReplace($cut.index(), $cut.index() + 1) &&
+          (conn = (match = before.contentMatchAt(before.childCount)).findWrapping(after.type)) &&
+          match.matchType(conn[0] || after.type).validEnd) {
+          if (dispatch) {
+              let end = $cut.pos + after.nodeSize,
+                  wrap = Fragment.empty;
+              for (let i = conn.length - 1; i >= 0; i--)
+                  wrap = Fragment.from(conn[i].create(null, wrap));
+              wrap = Fragment.from(before.copy(wrap));
+              let tr = state.tr.step(new ReplaceAroundStep($cut.pos - 1, end, $cut.pos, end, new Slice(wrap, 1, 0), conn.length, true));
+              let joinAt = end + 2 * conn.length;
+              if (canJoin(tr.doc, joinAt)) tr.join(joinAt);
+              dispatch(tr.scrollIntoView());
+          }
+          return true
+      }
+
+      let selAfter = Selection.findFrom($cut, 1);
+      let range = selAfter && selAfter.$from.blockRange(selAfter.$to),
+          target = range && liftTarget(range);
+      if (target != null && target >= $cut.depth) {
+          if (dispatch) dispatch(state.tr.lift(range, target).scrollIntoView());
+          return true
+      }
+
+      return false
+  }
+
+  // Parameterized commands
+
+  // :: (NodeType, ?Object) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
+  // Wrap the selection in a node of the given type with the given
+  // attributes.
+  function wrapIn(nodeType, attrs) {
+      return function(state, dispatch) {
+          let {
+              $from,
+              $to
+          } = state.selection;
+          let range = $from.blockRange($to),
+              wrapping = range && findWrapping(range, nodeType, attrs);
+          if (!wrapping) return false
+          if (dispatch) dispatch(state.tr.wrap(range, wrapping).scrollIntoView());
+          return true
+      }
+  }
+
+  // :: (NodeType, ?Object) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
+  // Returns a command that tries to set the selected textblocks to the
+  // given node type with the given attributes.
+  function setBlockType(nodeType, attrs) {
+      return function(state, dispatch) {
+          if(!nodeType){
+              console.trace();
+              throw('nodeType missing');
+          }
+
+          let { from, to } = state.selection;
+          let applicable = false;
+
+          state.doc.nodesBetween(from, to, (node, pos) => {
+              if (applicable) {
+                  return false;
+              }
+              if (!node.isTextblock || node.hasMarkup(nodeType, attrs)) {
                   return;
               }
-              if(!crel[isNodeString](child)){
-                  child = d.createTextNode(child);
-              }
-              element.appendChild(child);
-          };
 
-
-      function crel(){
-          var args = arguments, //Note: assigned to a variable to assist compilers. Saves about 40 bytes in closure compiler. Has negligable effect on performance.
-              element = args[0],
-              child,
-              settings = args[1],
-              childIndex = 2,
-              argumentsLength = args.length,
-              attributeMap = crel[attrMapString];
-
-          element = crel[isElementString](element) ? element : d.createElement(element);
-          // shortcut
-          if(argumentsLength === 1){
-              return element;
-          }
-
-          if(!isType(settings,obj) || crel[isNodeString](settings) || isArray(settings)) {
-              --childIndex;
-              settings = null;
-          }
-
-          // shortcut if there is only one child that is a string
-          if((argumentsLength - childIndex) === 1 && isType(args[childIndex], 'string') && element[textContent] !== undefined){
-              element[textContent] = args[childIndex];
-          }else{
-              for(; childIndex < argumentsLength; ++childIndex){
-                  child = args[childIndex];
-
-                  if(child == null){
-                      continue;
-                  }
-
-                  if (isArray(child)) {
-                    for (var i=0; i < child.length; ++i) {
-                      appendChild(element, child[i]);
-                    }
-                  } else {
-                    appendChild(element, child);
-                  }
-              }
-          }
-
-          for(var key in settings){
-              if(!attributeMap[key]){
-                  if(isType(settings[key],fn)){
-                      element[key] = settings[key];
-                  }else{
-                      element[setAttribute](key, settings[key]);
-                  }
-              }else{
-                  var attr = attributeMap[key];
-                  if(typeof attr === fn){
-                      attr(element, settings[key]);
-                  }else{
-                      element[setAttribute](attr, settings[key]);
-                  }
-              }
-          }
-
-          return element;
-      }
-
-      // Used for mapping one kind of attribute to the supported version of that in bad browsers.
-      crel[attrMapString] = {};
-
-      crel[isElementString] = isElement;
-
-      crel[isNodeString] = isNode;
-
-      if(typeof Proxy !== 'undefined'){
-          crel.proxy = new Proxy(crel, {
-              get: function(target, key){
-                  !(key in crel) && (crel[key] = crel.bind(null, key));
-                  return crel[key];
+              if (node.type == nodeType) {
+                  applicable = true;
+              } else {
+                  let $pos = state.doc.resolve(pos);
+                  let index = $pos.index();
+                  applicable = $pos.parent.canReplaceWith(index, index + 1, nodeType);
               }
           });
-      }
-
-      return crel;
-  }));
-  });
-
-  var SVG = "http://www.w3.org/2000/svg";
-  var XLINK = "http://www.w3.org/1999/xlink";
-
-  var prefix = "ProseMirror-icon";
-
-  function hashPath(path) {
-    var hash = 0;
-    for (var i = 0; i < path.length; i++)
-      { hash = (((hash << 5) - hash) + path.charCodeAt(i)) | 0; }
-    return hash
-  }
-
-  function getIcon(icon) {
-    var node = document.createElement("div");
-    node.className = prefix;
-    if (icon.path) {
-      var name = "pm-icon-" + hashPath(icon.path).toString(16);
-      if (!document.getElementById(name)) { buildSVG(name, icon); }
-      var svg = node.appendChild(document.createElementNS(SVG, "svg"));
-      svg.style.width = (icon.width / icon.height) + "em";
-      var use = svg.appendChild(document.createElementNS(SVG, "use"));
-      use.setAttributeNS(XLINK, "href", /([^#]*)/.exec(document.location)[1] + "#" + name);
-    } else if (icon.dom) {
-      node.appendChild(icon.dom.cloneNode(true));
-    } else {
-      node.appendChild(document.createElement("span")).textContent = icon.text || '';
-      if (icon.css) { node.firstChild.style.cssText = icon.css; }
-    }
-    return node
-  }
-
-  function buildSVG(name, data) {
-    var collection = document.getElementById(prefix + "-collection");
-    if (!collection) {
-      collection = document.createElementNS(SVG, "svg");
-      collection.id = prefix + "-collection";
-      collection.style.display = "none";
-      document.body.insertBefore(collection, document.body.firstChild);
-    }
-    var sym = document.createElementNS(SVG, "symbol");
-    sym.id = name;
-    sym.setAttribute("viewBox", "0 0 " + data.width + " " + data.height);
-    var path = sym.appendChild(document.createElementNS(SVG, "path"));
-    path.setAttribute("d", data.path);
-    collection.appendChild(sym);
-  }
-
-  var prefix$1 = "ProseMirror-menu";
-
-  // ::- An icon or label that, when clicked, executes a command.
-  var MenuItem = function MenuItem(spec) {
-    // :: MenuItemSpec
-    // The spec used to create the menu item.
-    this.spec = spec;
-  };
-
-  // :: (EditorView) → {dom: dom.Node, update: (EditorState) → bool}
-  // Renders the icon according to its [display
-  // spec](#menu.MenuItemSpec.display), and adds an event handler which
-  // executes the command when the representation is clicked.
-  MenuItem.prototype.render = function render (view) {
-    var spec = this.spec;
-    var dom = spec.render ? spec.render(view)
-        : spec.icon ? getIcon(spec.icon)
-        : spec.label ? crel("div", null, translate(view, spec.label))
-        : null;
-    if (!dom) { throw new RangeError("MenuItem without icon or label property") }
-    if (spec.title) {
-      var title = (typeof spec.title === "function" ? spec.title(view.state) : spec.title);
-      dom.setAttribute("title", translate(view, title));
-    }
-    if (spec.class) { dom.classList.add(spec.class); }
-    if (spec.css) { dom.style.cssText += spec.css; }
-
-    dom.addEventListener("mousedown", function (e) {
-      e.preventDefault();
-      if (!dom.classList.contains(prefix$1 + "-disabled"))
-        { spec.run(view.state, view.dispatch, view, e); }
-    });
-
-    function update(state) {
-      if (spec.select) {
-        var selected = spec.select(state);
-        dom.style.display = selected ? "" : "none";
-        if (!selected) { return false }
-      }
-      var enabled = true;
-      if (spec.enable) {
-        enabled = spec.enable(state) || false;
-        setClass(dom, prefix$1 + "-disabled", !enabled);
-      }
-      if (spec.active) {
-        var active = enabled && spec.active(state) || false;
-        setClass(dom, prefix$1 + "-active", active);
-      }
-      return true
-    }
-
-    return {dom: dom, update: update}
-  };
-
-  function translate(view, text) {
-    return view._props.translate ? view._props.translate(text) : text
-  }
-
-  // MenuItemSpec:: interface
-  // The configuration object passed to the `MenuItem` constructor.
-  //
-  //   run:: (EditorState, (Transaction), EditorView, dom.Event)
-  //   The function to execute when the menu item is activated.
-  //
-  //   select:: ?(EditorState) → bool
-  //   Optional function that is used to determine whether the item is
-  //   appropriate at the moment. Deselected items will be hidden.
-  //
-  //   enable:: ?(EditorState) → bool
-  //   Function that is used to determine if the item is enabled. If
-  //   given and returning false, the item will be given a disabled
-  //   styling.
-  //
-  //   active:: ?(EditorState) → bool
-  //   A predicate function to determine whether the item is 'active' (for
-  //   example, the item for toggling the strong mark might be active then
-  //   the cursor is in strong text).
-  //
-  //   render:: ?(EditorView) → dom.Node
-  //   A function that renders the item. You must provide either this,
-  //   [`icon`](#menu.MenuItemSpec.icon), or [`label`](#MenuItemSpec.label).
-  //
-  //   icon:: ?Object
-  //   Describes an icon to show for this item. The object may specify
-  //   an SVG icon, in which case its `path` property should be an [SVG
-  //   path
-  //   spec](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d),
-  //   and `width` and `height` should provide the viewbox in which that
-  //   path exists. Alternatively, it may have a `text` property
-  //   specifying a string of text that makes up the icon, with an
-  //   optional `css` property giving additional CSS styling for the
-  //   text. _Or_ it may contain `dom` property containing a DOM node.
-  //
-  //   label:: ?string
-  //   Makes the item show up as a text label. Mostly useful for items
-  //   wrapped in a [drop-down](#menu.Dropdown) or similar menu. The object
-  //   should have a `label` property providing the text to display.
-  //
-  //   title:: ?union<string, (EditorState) → string>
-  //   Defines DOM title (mouseover) text for the item.
-  //
-  //   class:: ?string
-  //   Optionally adds a CSS class to the item's DOM representation.
-  //
-  //   css:: ?string
-  //   Optionally adds a string of inline CSS to the item's DOM
-  //   representation.
-  //
-  //   execEvent:: ?string
-  //   Defines which event on the command's DOM representation should
-  //   trigger the execution of the command. Defaults to mousedown.
-
-  var lastMenuEvent = {time: 0, node: null};
-  function markMenuEvent(e) {
-    lastMenuEvent.time = Date.now();
-    lastMenuEvent.node = e.target;
-  }
-  function isMenuEvent(wrapper) {
-    return Date.now() - 100 < lastMenuEvent.time &&
-      lastMenuEvent.node && wrapper.contains(lastMenuEvent.node)
-  }
-
-  // ::- A drop-down menu, displayed as a label with a downwards-pointing
-  // triangle to the right of it.
-  var Dropdown = function Dropdown(content, options) {
-    this.options = options || {};
-    this.content = Array.isArray(content) ? content : [content];
-  };
-
-  // :: (EditorView) → {dom: dom.Node, update: (EditorState)}
-  // Render the dropdown menu and sub-items.
-  Dropdown.prototype.render = function render (view) {
-      var this$1 = this;
-
-    var content = renderDropdownItems(this.content, view);
-
-    var label = crel("div", {class: prefix$1 + "-dropdown " + (this.options.class || ""),
-                             style: this.options.css},
-                     translate(view, this.options.label));
-    if (this.options.title) { label.setAttribute("title", translate(view, this.options.title)); }
-    var wrap = crel("div", {class: prefix$1 + "-dropdown-wrap"}, label);
-    var open = null, listeningOnClose = null;
-    var close = function () {
-      if (open && open.close()) {
-        open = null;
-        window.removeEventListener("mousedown", listeningOnClose);
-      }
-    };
-    label.addEventListener("mousedown", function (e) {
-      e.preventDefault();
-      markMenuEvent(e);
-      if (open) {
-        close();
-      } else {
-        open = this$1.expand(wrap, content.dom);
-        window.addEventListener("mousedown", listeningOnClose = function () {
-          if (!isMenuEvent(wrap)) { close(); }
-        });
-      }
-    });
-
-    function update(state) {
-      var inner = content.update(state);
-      wrap.style.display = inner ? "" : "none";
-      return inner
-    }
-
-    return {dom: wrap, update: update}
-  };
-
-  Dropdown.prototype.expand = function expand (dom, items) {
-    var menuDOM = crel("div", {class: prefix$1 + "-dropdown-menu " + (this.options.class || "")}, items);
-
-    var done = false;
-    function close() {
-      if (done) { return }
-      done = true;
-      dom.removeChild(menuDOM);
-      return true
-    }
-    dom.appendChild(menuDOM);
-    return {close: close, node: menuDOM}
-  };
-
-  function renderDropdownItems(items, view) {
-    var rendered = [], updates = [];
-    for (var i = 0; i < items.length; i++) {
-      var ref = items[i].render(view);
-      var dom = ref.dom;
-      var update = ref.update;
-      rendered.push(crel("div", {class: prefix$1 + "-dropdown-item"}, dom));
-      updates.push(update);
-    }
-    return {dom: rendered, update: combineUpdates(updates, rendered)}
-  }
-
-  function combineUpdates(updates, nodes) {
-    return function (state) {
-      var something = false;
-      for (var i = 0; i < updates.length; i++) {
-        var up = updates[i](state);
-        nodes[i].style.display = up ? "" : "none";
-        if (up) { something = true; }
-      }
-      return something
-    }
-  }
-
-  // ::- Represents a submenu wrapping a group of elements that start
-  // hidden and expand to the right when hovered over or tapped.
-  var DropdownSubmenu = function DropdownSubmenu(content, options) {
-    this.options = options || {};
-    this.content = Array.isArray(content) ? content : [content];
-  };
-
-  // :: (EditorView) → {dom: dom.Node, update: (EditorState) → bool}
-  // Renders the submenu.
-  DropdownSubmenu.prototype.render = function render (view) {
-    var items = renderDropdownItems(this.content, view);
-
-    var label = crel("div", {class: prefix$1 + "-submenu-label"}, translate(view, this.options.label));
-    var wrap = crel("div", {class: prefix$1 + "-submenu-wrap"}, label,
-                   crel("div", {class: prefix$1 + "-submenu"}, items.dom));
-    var listeningOnClose = null;
-    label.addEventListener("mousedown", function (e) {
-      e.preventDefault();
-      markMenuEvent(e);
-      setClass(wrap, prefix$1 + "-submenu-wrap-active");
-      if (!listeningOnClose)
-        { window.addEventListener("mousedown", listeningOnClose = function () {
-          if (!isMenuEvent(wrap)) {
-            wrap.classList.remove(prefix$1 + "-submenu-wrap-active");
-            window.removeEventListener("mousedown", listeningOnClose);
-            listeningOnClose = null;
+          if (!applicable) {
+              return false
           }
-        }); }
-    });
 
-    function update(state) {
-      var inner = items.update(state);
-      wrap.style.display = inner ? "" : "none";
-      return inner
-    }
-    return {dom: wrap, update: update}
-  };
-
-  // :: (EditorView, [union<MenuElement, [MenuElement]>]) → {dom: ?dom.DocumentFragment, update: (EditorState) → bool}
-  // Render the given, possibly nested, array of menu elements into a
-  // document fragment, placing separators between them (and ensuring no
-  // superfluous separators appear when some of the groups turn out to
-  // be empty).
-  function renderGrouped(view, content) {
-    var result = document.createDocumentFragment();
-    var updates = [], separators = [];
-    for (var i = 0; i < content.length; i++) {
-      var items = content[i], localUpdates = [], localNodes = [];
-      for (var j = 0; j < items.length; j++) {
-        var ref = items[j].render(view);
-        var dom = ref.dom;
-        var update$1 = ref.update;
-        var span = crel("span", {class: prefix$1 + "item"}, dom);
-        result.appendChild(span);
-        localNodes.push(span);
-        localUpdates.push(update$1);
+          if (dispatch) dispatch(state.tr.setBlockType(from, to, nodeType, attrs).scrollIntoView());
+          return true
       }
-      if (localUpdates.length) {
-        updates.push(combineUpdates(localUpdates, localNodes));
-        if (i < content.length - 1)
-          { separators.push(result.appendChild(separator())); }
-      }
-    }
-
-    function update(state) {
-      var something = false, needSep = false;
-      for (var i = 0; i < updates.length; i++) {
-        var hasContent = updates[i](state);
-        if (i) { separators[i - 1].style.display = needSep && hasContent ? "" : "none"; }
-        needSep = hasContent;
-        if (hasContent) { something = true; }
-      }
-      return something
-    }
-    return {dom: result, update: update}
   }
 
-  function separator() {
-    return crel("span", {class: prefix$1 + "separator"})
+  function markApplies(doc, ranges, type) {
+      for (let i = 0; i < ranges.length; i++) {
+          let {
+              $from,
+              $to
+          } = ranges[i];
+          let can = $from.depth == 0 ? doc.type.allowsMarkType(type) : false;
+          doc.nodesBetween($from.pos, $to.pos, node => {
+              if (can) return false
+              can = node.inlineContent && node.type.allowsMarkType(type);
+          });
+          if (can) return true
+      }
+      return false
   }
+
+  // :: (MarkType, ?Object) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
+  // Create a command function that toggles the given mark with the
+  // given attributes. Will return `false` when the current selection
+  // doesn't support that mark. This will remove the mark if any marks
+  // of that type exist in the selection, or add it otherwise. If the
+  // selection is empty, this applies to the [stored
+  // marks](#state.EditorState.storedMarks) instead of a range of the
+  // document.
+  function toggleMark(markType, attrs) {
+      return function(state, dispatch) {
+          let {
+              empty,
+              $cursor,
+              ranges
+          } = state.selection;
+          if ((empty && !$cursor) || !markApplies(state.doc, ranges, markType)) return false
+          if (dispatch) {
+              if ($cursor) {
+                  if (markType.isInSet(state.storedMarks || $cursor.marks()))
+                      dispatch(state.tr.removeStoredMark(markType));
+                  else
+                      dispatch(state.tr.addStoredMark(markType.create(attrs)));
+              } else {
+                  let has = false,
+                      tr = state.tr;
+                  for (let i = 0; !has && i < ranges.length; i++) {
+                      let {
+                          $from,
+                          $to
+                      } = ranges[i];
+                      has = state.doc.rangeHasMark($from.pos, $to.pos, markType);
+                  }
+                  for (let i = 0; i < ranges.length; i++) {
+                      let {
+                          $from,
+                          $to
+                      } = ranges[i];
+                      if (has) tr.removeMark($from.pos, $to.pos, markType);
+                      else tr.addMark($from.pos, $to.pos, markType.create(attrs));
+                  }
+                  dispatch(tr.scrollIntoView());
+              }
+          }
+          return true
+      }
+  }
+
+  // :: (...[(EditorState, ?(tr: Transaction), ?EditorView) → bool]) → (EditorState, ?(tr: Transaction), ?EditorView) → bool
+  // Combine a number of command functions into a single function (which
+  // calls them one by one until one returns true).
+  function chainCommands(...commands) {
+      return function(state, dispatch, view) {
+          for (let i = 0; i < commands.length; i++)
+              if (commands[i](state, dispatch, view)) return true
+          return false
+      }
+  }
+
+  let backspace = chainCommands(deleteSelection, joinBackward, selectNodeBackward);
+  let del = chainCommands(deleteSelection, joinForward, selectNodeForward);
 
   // :: Object
-  // A set of basic editor-related icons. Contains the properties
-  // `join`, `lift`, `selectParentNode`, `undo`, `redo`, `strong`, `em`,
-  // `code`, `link`, `bulletList`, `orderedList`, and `blockquote`, each
-  // holding an object that can be used as the `icon` option to
-  // `MenuItem`.
-  var icons = {
-    join: {
-      width: 800, height: 900,
-      path: "M0 75h800v125h-800z M0 825h800v-125h-800z M250 400h100v-100h100v100h100v100h-100v100h-100v-100h-100z"
-    },
-    lift: {
-      width: 1024, height: 1024,
-      path: "M219 310v329q0 7-5 12t-12 5q-8 0-13-5l-164-164q-5-5-5-13t5-13l164-164q5-5 13-5 7 0 12 5t5 12zM1024 749v109q0 7-5 12t-12 5h-987q-7 0-12-5t-5-12v-109q0-7 5-12t12-5h987q7 0 12 5t5 12zM1024 530v109q0 7-5 12t-12 5h-621q-7 0-12-5t-5-12v-109q0-7 5-12t12-5h621q7 0 12 5t5 12zM1024 310v109q0 7-5 12t-12 5h-621q-7 0-12-5t-5-12v-109q0-7 5-12t12-5h621q7 0 12 5t5 12zM1024 91v109q0 7-5 12t-12 5h-987q-7 0-12-5t-5-12v-109q0-7 5-12t12-5h987q7 0 12 5t5 12z"
-    },
-    selectParentNode: {text: "\u2b1a", css: "font-weight: bold"},
-    undo: {
-      width: 1024, height: 1024,
-      path: "M761 1024c113-206 132-520-313-509v253l-384-384 384-384v248c534-13 594 472 313 775z"
-    },
-    redo: {
-      width: 1024, height: 1024,
-      path: "M576 248v-248l384 384-384 384v-253c-446-10-427 303-313 509-280-303-221-789 313-775z"
-    },
-    strong: {
-      width: 805, height: 1024,
-      path: "M317 869q42 18 80 18 214 0 214-191 0-65-23-102-15-25-35-42t-38-26-46-14-48-6-54-1q-41 0-57 5 0 30-0 90t-0 90q0 4-0 38t-0 55 2 47 6 38zM309 442q24 4 62 4 46 0 81-7t62-25 42-51 14-81q0-40-16-70t-45-46-61-24-70-8q-28 0-74 7 0 28 2 86t2 86q0 15-0 45t-0 45q0 26 0 39zM0 950l1-53q8-2 48-9t60-15q4-6 7-15t4-19 3-18 1-21 0-19v-37q0-561-12-585-2-4-12-8t-25-6-28-4-27-2-17-1l-2-47q56-1 194-6t213-5q13 0 39 0t38 0q40 0 78 7t73 24 61 40 42 59 16 78q0 29-9 54t-22 41-36 32-41 25-48 22q88 20 146 76t58 141q0 57-20 102t-53 74-78 48-93 27-100 8q-25 0-75-1t-75-1q-60 0-175 6t-132 6z"
-    },
-    em: {
-      width: 585, height: 1024,
-      path: "M0 949l9-48q3-1 46-12t63-21q16-20 23-57 0-4 35-165t65-310 29-169v-14q-13-7-31-10t-39-4-33-3l10-58q18 1 68 3t85 4 68 1q27 0 56-1t69-4 56-3q-2 22-10 50-17 5-58 16t-62 19q-4 10-8 24t-5 22-4 26-3 24q-15 84-50 239t-44 203q-1 5-7 33t-11 51-9 47-3 32l0 10q9 2 105 17-1 25-9 56-6 0-18 0t-18 0q-16 0-49-5t-49-5q-78-1-117-1-29 0-81 5t-69 6z"
-    },
-    code: {
-      width: 896, height: 1024,
-      path: "M608 192l-96 96 224 224-224 224 96 96 288-320-288-320zM288 192l-288 320 288 320 96-96-224-224 224-224-96-96z"
-    },
-    link: {
-      width: 951, height: 1024,
-      path: "M832 694q0-22-16-38l-118-118q-16-16-38-16-24 0-41 18 1 1 10 10t12 12 8 10 7 14 2 15q0 22-16 38t-38 16q-8 0-15-2t-14-7-10-8-12-12-10-10q-18 17-18 41 0 22 16 38l117 118q15 15 38 15 22 0 38-14l84-83q16-16 16-38zM430 292q0-22-16-38l-117-118q-16-16-38-16-22 0-38 15l-84 83q-16 16-16 38 0 22 16 38l118 118q15 15 38 15 24 0 41-17-1-1-10-10t-12-12-8-10-7-14-2-15q0-22 16-38t38-16q8 0 15 2t14 7 10 8 12 12 10 10q18-17 18-41zM941 694q0 68-48 116l-84 83q-47 47-116 47-69 0-116-48l-117-118q-47-47-47-116 0-70 50-119l-50-50q-49 50-118 50-68 0-116-48l-118-118q-48-48-48-116t48-116l84-83q47-47 116-47 69 0 116 48l117 118q47 47 47 116 0 70-50 119l50 50q49-50 118-50 68 0 116 48l118 118q48 48 48 116z"
-    },
-    bulletList: {
-      width: 768, height: 896,
-      path: "M0 512h128v-128h-128v128zM0 256h128v-128h-128v128zM0 768h128v-128h-128v128zM256 512h512v-128h-512v128zM256 256h512v-128h-512v128zM256 768h512v-128h-512v128z"
-    },
-    orderedList: {
-      width: 768, height: 896,
-      path: "M320 512h448v-128h-448v128zM320 768h448v-128h-448v128zM320 128v128h448v-128h-448zM79 384h78v-256h-36l-85 23v50l43-2v185zM189 590c0-36-12-78-96-78-33 0-64 6-83 16l1 66c21-10 42-15 67-15s32 11 32 28c0 26-30 58-110 112v50h192v-67l-91 2c49-30 87-66 87-113l1-1z"
-    },
-    blockquote: {
-      width: 640, height: 896,
-      path: "M0 448v256h256v-256h-128c0 0 0-128 128-128v-128c0 0-256 0-256 256zM640 320v-128c0 0-256 0-256 256v256h256v-256h-128c0 0 0-128 128-128z"
-    }
+  // A basic keymap containing bindings not specific to any schema.
+  // Binds the following keys (when multiple commands are listed, they
+  // are chained with [`chainCommands`](#commands.chainCommands)):
+  //
+  // * **Enter** to `newlineInCode`, `createParagraphNear`, `liftEmptyBlock`, `splitBlock`
+  // * **Mod-Enter** to `exitCode`
+  // * **Backspace** and **Mod-Backspace** to `deleteSelection`, `joinBackward`, `selectNodeBackward`
+  // * **Delete** and **Mod-Delete** to `deleteSelection`, `joinForward`, `selectNodeForward`
+  // * **Mod-Delete** to `deleteSelection`, `joinForward`, `selectNodeForward`
+  // * **Mod-a** to `selectAll`
+  let pcBaseKeymap = {
+      "Enter": chainCommands(newlineInCode, createParagraphNear, liftEmptyBlock, splitBlock),
+      "Mod-Enter": exitCode,
+      "Backspace": backspace,
+      "Mod-Backspace": backspace,
+      "Delete": del,
+      "Mod-Delete": del,
+      "Mod-a": selectAll
   };
 
-  // :: MenuItem
-  // Menu item for the `joinUp` command.
-  var joinUpItem = new MenuItem({
-    title: "Join with above block",
-    run: joinUp,
-    select: function (state) { return joinUp(state); },
-    icon: icons.join
-  });
-
-  // :: MenuItem
-  // Menu item for the `lift` command.
-  var liftItem = new MenuItem({
-    title: "Lift out of enclosing block",
-    run: lift,
-    select: function (state) { return lift(state); },
-    icon: icons.lift
-  });
-
-  // :: MenuItem
-  // Menu item for the `selectParentNode` command.
-  var selectParentNodeItem = new MenuItem({
-    title: "Select parent node",
-    run: selectParentNode,
-    select: function (state) { return selectParentNode(state); },
-    icon: icons.selectParentNode
-  });
-
-  // :: MenuItem
-  // Menu item for the `undo` command.
-  var undoItem = new MenuItem({
-    title: "Undo last change",
-    run: undo,
-    enable: function (state) { return undo(state); },
-    icon: icons.undo
-  });
-
-  // :: MenuItem
-  // Menu item for the `redo` command.
-  var redoItem = new MenuItem({
-    title: "Redo last undone change",
-    run: redo,
-    enable: function (state) { return redo(state); },
-    icon: icons.redo
-  });
-
-  // :: (NodeType, Object) → MenuItem
-  // Build a menu item for wrapping the selection in a given node type.
-  // Adds `run` and `select` properties to the ones present in
-  // `options`. `options.attrs` may be an object or a function.
-  function wrapItem(nodeType, options) {
-    var passedOptions = {
-      run: function run(state, dispatch) {
-        // FIXME if (options.attrs instanceof Function) options.attrs(state, attrs => wrapIn(nodeType, attrs)(state))
-        return wrapIn(nodeType, options.attrs)(state, dispatch)
-      },
-      select: function select(state) {
-        return wrapIn(nodeType, options.attrs instanceof Function ? null : options.attrs)(state)
-      }
-    };
-    for (var prop in options) { passedOptions[prop] = options[prop]; }
-    return new MenuItem(passedOptions)
-  }
-
-  // :: (NodeType, Object) → MenuItem
-  // Build a menu item for changing the type of the textblock around the
-  // selection to the given type. Provides `run`, `active`, and `select`
-  // properties. Others must be given in `options`. `options.attrs` may
-  // be an object to provide the attributes for the textblock node.
-  function blockTypeItem(nodeType, options) {
-    var command = setBlockType(nodeType, options.attrs);
-    var passedOptions = {
-      run: command,
-      enable: function enable(state) { return command(state) },
-      active: function active(state) {
-        var ref = state.selection;
-        var $from = ref.$from;
-        var to = ref.to;
-        var node = ref.node;
-        if (node) { return node.hasMarkup(nodeType, options.attrs) }
-        return to <= $from.end() && $from.parent.hasMarkup(nodeType, options.attrs)
-      }
-    };
-    for (var prop in options) { passedOptions[prop] = options[prop]; }
-    return new MenuItem(passedOptions)
-  }
-
-  // Work around classList.toggle being broken in IE11
-  function setClass(dom, cls, on) {
-    if (on) { dom.classList.add(cls); }
-    else { dom.classList.remove(cls); }
-  }
-
-  var prefix$2 = "ProseMirror-menubar";
-
-  function isIOS() {
-    if (typeof navigator == "undefined") { return false }
-    var agent = navigator.userAgent;
-    return !/Edge\/\d/.test(agent) && /AppleWebKit/.test(agent) && /Mobile\/\w+/.test(agent)
-  }
-
-  // :: (Object) → Plugin
-  // A plugin that will place a menu bar above the editor. Note that
-  // this involves wrapping the editor in an additional `<div>`.
-  //
-  //   options::-
-  //   Supports the following options:
-  //
-  //     content:: [[MenuElement]]
-  //     Provides the content of the menu, as a nested array to be
-  //     passed to `renderGrouped`.
-  //
-  //     floating:: ?bool
-  //     Determines whether the menu floats, i.e. whether it sticks to
-  //     the top of the viewport when the editor is partially scrolled
-  //     out of view.
-  function menuBar(options) {
-    return new Plugin({
-      view: function view(editorView) { return new MenuBarView(editorView, options) }
-    })
-  }
-
-  var MenuBarView = function MenuBarView(editorView, options) {
-    var this$1 = this;
-
-    this.editorView = editorView;
-    this.options = options;
-
-    this.wrapper = crel("div", {class: prefix$2 + "-wrapper"});
-    this.menu = this.wrapper.appendChild(crel("div", {class: prefix$2}));
-    this.menu.className = prefix$2;
-    this.spacer = null;
-
-    editorView.dom.parentNode.replaceChild(this.wrapper, editorView.dom);
-    this.wrapper.appendChild(editorView.dom);
-
-    this.maxHeight = 0;
-    this.widthForMaxHeight = 0;
-    this.floating = false;
-
-    var ref = renderGrouped(this.editorView, this.options.content);
-    var dom = ref.dom;
-    var update = ref.update;
-    this.contentUpdate = update;
-    this.menu.appendChild(dom);
-    this.update();
-
-    if (options.floating && !isIOS()) {
-      this.updateFloat();
-      var potentialScrollers = getAllWrapping(this.wrapper);
-      this.scrollFunc = function (e) {
-        var root = this$1.editorView.root;
-        if (!(root.body || root).contains(this$1.wrapper)) {
-            potentialScrollers.forEach(function (el) { return el.removeEventListener("scroll", this$1.scrollFunc); });
-        } else {
-            this$1.updateFloat(e.target.getBoundingClientRect && e.target);
-        }
-      };
-      potentialScrollers.forEach(function (el) { return el.addEventListener('scroll', this$1.scrollFunc); });
-    }
+  // :: Object
+  // A copy of `pcBaseKeymap` that also binds **Ctrl-h** like Backspace,
+  // **Ctrl-d** like Delete, **Alt-Backspace** like Ctrl-Backspace, and
+  // **Ctrl-Alt-Backspace**, **Alt-Delete**, and **Alt-d** like
+  // Ctrl-Delete.
+  let macBaseKeymap = {
+      "Ctrl-h": pcBaseKeymap["Backspace"],
+      "Alt-Backspace": pcBaseKeymap["Mod-Backspace"],
+      "Ctrl-d": pcBaseKeymap["Delete"],
+      "Ctrl-Alt-Backspace": pcBaseKeymap["Mod-Delete"],
+      "Alt-Delete": pcBaseKeymap["Mod-Delete"],
+      "Alt-d": pcBaseKeymap["Mod-Delete"]
   };
+  for (let key in pcBaseKeymap) macBaseKeymap[key] = pcBaseKeymap[key];
 
-  MenuBarView.prototype.update = function update () {
-    this.contentUpdate(this.editorView.state);
+  // declare global: os, navigator
+  const mac$2 = typeof navigator != "undefined" ? /Mac/.test(navigator.platform) :
+      typeof os != "undefined" ? os.platform() == "darwin" : false;
 
-    if (this.floating) {
-      this.updateScrollCursor();
-    } else {
-      if (this.menu.offsetWidth != this.widthForMaxHeight) {
-        this.widthForMaxHeight = this.menu.offsetWidth;
-        this.maxHeight = 0;
-      }
-      if (this.menu.offsetHeight > this.maxHeight) {
-        this.maxHeight = this.menu.offsetHeight;
-        this.menu.style.minHeight = this.maxHeight + "px";
-      }
-    }
-  };
-
-  MenuBarView.prototype.updateScrollCursor = function updateScrollCursor () {
-    var selection = this.editorView.root.getSelection();
-    if (!selection.focusNode) { return }
-    var rects = selection.getRangeAt(0).getClientRects();
-    var selRect = rects[selectionIsInverted(selection) ? 0 : rects.length - 1];
-    if (!selRect) { return }
-    var menuRect = this.menu.getBoundingClientRect();
-    if (selRect.top < menuRect.bottom && selRect.bottom > menuRect.top) {
-      var scrollable = findWrappingScrollable(this.wrapper);
-      if (scrollable) { scrollable.scrollTop -= (menuRect.bottom - selRect.top); }
-    }
-  };
-
-  MenuBarView.prototype.updateFloat = function updateFloat (scrollAncestor) {
-    var parent = this.wrapper, editorRect = parent.getBoundingClientRect(),
-        top = scrollAncestor ? Math.max(0, scrollAncestor.getBoundingClientRect().top) : 0;
-
-    if (this.floating) {
-      if (editorRect.top >= top || editorRect.bottom < this.menu.offsetHeight + 10) {
-        this.floating = false;
-        this.menu.style.position = this.menu.style.left = this.menu.style.top = this.menu.style.width = "";
-        this.menu.style.display = "";
-        this.spacer.parentNode.removeChild(this.spacer);
-        this.spacer = null;
-      } else {
-        var border = (parent.offsetWidth - parent.clientWidth) / 2;
-        this.menu.style.left = (editorRect.left + border) + "px";
-        this.menu.style.display = (editorRect.top > window.innerHeight ? "none" : "");
-        if (scrollAncestor) { this.menu.style.top = top + "px"; }
-      }
-    } else {
-      if (editorRect.top < top && editorRect.bottom >= this.menu.offsetHeight + 10) {
-        this.floating = true;
-        var menuRect = this.menu.getBoundingClientRect();
-        this.menu.style.left = menuRect.left + "px";
-        this.menu.style.width = menuRect.width + "px";
-        if (scrollAncestor) { this.menu.style.top = top + "px"; }
-        this.menu.style.position = "fixed";
-        this.spacer = crel("div", {class: prefix$2 + "-spacer", style: ("height: " + (menuRect.height) + "px")});
-        parent.insertBefore(this.spacer, this.menu);
-      }
-    }
-  };
-
-  MenuBarView.prototype.destroy = function destroy () {
-    if (this.wrapper.parentNode)
-      { this.wrapper.parentNode.replaceChild(this.editorView.dom, this.wrapper); }
-  };
-
-  // Not precise, but close enough
-  function selectionIsInverted(selection) {
-    if (selection.anchorNode == selection.focusNode) { return selection.anchorOffset > selection.focusOffset }
-    return selection.anchorNode.compareDocumentPosition(selection.focusNode) == Node.DOCUMENT_POSITION_FOLLOWING
-  }
-
-  function findWrappingScrollable(node) {
-    for (var cur = node.parentNode; cur; cur = cur.parentNode)
-      { if (cur.scrollHeight > cur.clientHeight) { return cur } }
-  }
-
-  function getAllWrapping(node) {
-      var res = [window];
-      for (var cur = node.parentNode; cur; cur = cur.parentNode)
-          { res.push(cur); }
-      return res
-  }
-  //# sourceMappingURL=index.es.js.map
-
-  const prefix$3 = "ProseMirror-prompt";
-
-  function openPrompt(options) {
-      let wrapper = document.body.appendChild(document.createElement("div"));
-      wrapper.className = prefix$3;
-
-      let mouseOutside = e => {
-          if (!wrapper.contains(e.target)) close();
-      };
-      setTimeout(() => window.addEventListener("mousedown", mouseOutside), 50);
-      let close = () => {
-          window.removeEventListener("mousedown", mouseOutside);
-          if (wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
-      };
-
-      let domFields = [];
-      for (let name in options.fields) domFields.push(options.fields[name].render());
-
-      let submitButton = document.createElement("button");
-      submitButton.type = "submit";
-      submitButton.className = prefix$3 + "-submit";
-      submitButton.textContent = "OK";
-      let cancelButton = document.createElement("button");
-      cancelButton.type = "button";
-      cancelButton.className = prefix$3 + "-cancel";
-      cancelButton.textContent = "Cancel";
-      cancelButton.addEventListener("click", close);
-
-      let form = wrapper.appendChild(document.createElement("form"));
-      if (options.title) form.appendChild(document.createElement("h5")).textContent = options.title;
-      domFields.forEach(field => {
-          form.appendChild(document.createElement("div")).appendChild(field);
-      });
-      let buttons = form.appendChild(document.createElement("div"));
-      buttons.className = prefix$3 + "-buttons";
-      buttons.appendChild(submitButton);
-      buttons.appendChild(document.createTextNode(" "));
-      buttons.appendChild(cancelButton);
-
-      let box = wrapper.getBoundingClientRect();
-      wrapper.style.top = ((window.innerHeight - box.height) / 2) + "px";
-      wrapper.style.left = ((window.innerWidth - box.width) / 2) + "px";
-
-      let submit = () => {
-          let params = getValues(options.fields, domFields);
-          if (params) {
-              close();
-              options.callback(params);
-          }
-      };
-
-      form.addEventListener("submit", e => {
-          e.preventDefault();
-          submit();
-      });
-
-      form.addEventListener("keydown", e => {
-          if (e.keyCode == 27) {
-              e.preventDefault();
-              close();
-          } else if (e.keyCode == 13 && !(e.ctrlKey || e.metaKey || e.shiftKey)) {
-              e.preventDefault();
-              submit();
-          } else if (e.keyCode == 9) {
-              window.setTimeout(() => {
-                  if (!wrapper.contains(document.activeElement)) close();
-              }, 500);
-          }
-      });
-
-      let input = form.elements[0];
-      if (input) input.focus();
-  }
-
-  function getValues(fields, domFields) {
-      let result = Object.create(null),
-          i = 0;
-      for (let name in fields) {
-          let field = fields[name],
-              dom = domFields[i++];
-          let value = field.read(dom),
-              bad = field.validate(value);
-          if (bad) {
-              reportInvalid(dom, bad);
-              return null
-          }
-          result[name] = field.clean(value);
-      }
-      return result
-  }
-
-  function reportInvalid(dom, message) {
-      // FIXME this is awful and needs a lot more work
-      let parent = dom.parentNode;
-      let msg = parent.appendChild(document.createElement("div"));
-      msg.style.left = (dom.offsetLeft + dom.offsetWidth + 2) + "px";
-      msg.style.top = (dom.offsetTop - 5) + "px";
-      msg.className = "ProseMirror-invalid";
-      msg.textContent = message;
-      setTimeout(() => parent.removeChild(msg), 1500);
-  }
-
-  // ::- The type of field that `FieldPrompt` expects to be passed to it.
-  class Field {
-      // :: (Object)
-      // Create a field with the given options. Options support by all
-      // field types are:
-      //
-      // **`value`**`: ?any`
-      //   : The starting value for the field.
-      //
-      // **`label`**`: string`
-      //   : The label for the field.
-      //
-      // **`required`**`: ?bool`
-      //   : Whether the field is required.
-      //
-      // **`validate`**`: ?(any) → ?string`
-      //   : A function to validate the given value. Should return an
-      //     error message if it is not valid.
-      constructor(options) {
-          this.options = options;
-      }
-
-      // render:: (state: EditorState, props: Object) → dom.Node
-      // Render the field to the DOM. Should be implemented by all subclasses.
-
-      // :: (dom.Node) → any
-      // Read the field's value from its DOM node.
-      read(dom) {
-          return dom.value
-      }
-
-      // :: (any) → ?string
-      // A field-type-specific validation function.
-      validateType(_value) {}
-
-      validate(value) {
-          if (!value && this.options.required)
-              return "Required field"
-          return this.validateType(value) || (this.options.validate && this.options.validate(value))
-      }
-
-      clean(value) {
-          return this.options.clean ? this.options.clean(value) : value
-      }
-  }
-
-  // ::- A field class for single-line text fields.
-  class TextField extends Field {
-      render() {
-          let input = document.createElement("input");
-          input.type = "text";
-          input.placeholder = this.options.label;
-          input.value = this.options.value || "";
-          input.autocomplete = "off";
-          return input
-      }
-  }
-
-  // Helpers to create specific types of items
-
-  function canInsert(state, nodeType) {
-      let $from = state.selection.$from;
-      for (let d = $from.depth; d >= 0; d--) {
-          let index = $from.index(d);
-          if ($from.node(d).canReplaceWith(index, index, nodeType)) {
-              return true;
-          }
-      }
-
-      return false;
-  }
-
-  function insertImageItem(nodeType) {
-      return new MenuItem({
-          title: "Insert image",
-          label: "Image",
-          enable(state) {
-              return canInsert(state, nodeType)
-          },
-          run(state, _, view) {
-              let {
-                  from,
-                  to
-              } = state.selection, attrs = null;
-              if (state.selection instanceof NodeSelection && state.selection.node.type == nodeType)
-                  attrs = state.selection.node.attrs;
-              openPrompt({
-                  title: "Insert image",
-                  fields: {
-                      src: new TextField({
-                          label: "Location",
-                          required: true,
-                          value: attrs && attrs.src
-                      }),
-                      title: new TextField({
-                          label: "Title",
-                          value: attrs && attrs.title
-                      }),
-                      alt: new TextField({
-                          label: "Description",
-                          value: attrs ? attrs.alt : state.doc.textBetween(from, to, " ")
-                      })
-                  },
-                  callback(attrs) {
-                      view.dispatch(view.state.tr.replaceSelectionWith(nodeType.createAndFill(attrs)));
-                      view.focus();
-                  }
-              });
-          }
-      })
-  }
-
-  function cmdItem(cmd, options) {
-      let passedOptions = {
-          label: options.title,
-          run: cmd
-      };
-      for (let prop in options) {
-          passedOptions[prop] = options[prop];
-      }
-
-      if ((!options.enable || options.enable === true) && !options.select){
-          passedOptions[options.enable ? "enable" : "select"] = state => cmd(state);
-      }
-
-      return new MenuItem(passedOptions)
-  }
-
-  function markActive(state, type) {
-      let {
-          from,
-          $from,
-          to,
-          empty
-      } = state.selection;
-      if (empty) return type.isInSet(state.storedMarks || $from.marks())
-      else return state.doc.rangeHasMark(from, to, type)
-  }
-
-  function markItem(markType, options) {
-      let passedOptions = {
-          active(state) {
-              return markActive(state, markType)
-          },
-          enable: true
-      };
-      for (let prop in options) passedOptions[prop] = options[prop];
-      return cmdItem(toggleMark(markType), passedOptions)
-  }
-
-  function linkItem(markType) {
-      return new MenuItem({
-          title: "Add or remove link",
-          icon: icons.link,
-          active(state) {
-              return markActive(state, markType)
-          },
-          enable(state) {
-              return !state.selection.empty
-          },
-          run(state, dispatch, view) {
-              if (markActive(state, markType)) {
-                  toggleMark(markType)(state, dispatch);
-                  return true
-              }
-              openPrompt({
-                  title: "Create a link",
-                  fields: {
-                      href: new TextField({
-                          label: "Link target",
-                          required: true
-                      }),
-                      title: new TextField({
-                          label: "Title"
-                      })
-                  },
-                  callback(attrs) {
-                      toggleMark(markType, attrs)(view.state, view.dispatch);
-                      view.focus();
-                  }
-              });
-          }
-      })
-  }
-
-  function wrapListItem(nodeType, options) {
-      return cmdItem(wrapInList(nodeType, options.attrs), options)
-  }
-
-  // :: (Schema) → Object
-  // Given a schema, look for default mark and node types in it and
-  // return an object with relevant menu items relating to those marks:
-  //
-  // **`toggleStrong`**`: MenuItem`
-  //   : A menu item to toggle the [strong mark](#schema-basic.StrongMark).
-  //
-  // **`toggleEm`**`: MenuItem`
-  //   : A menu item to toggle the [emphasis mark](#schema-basic.EmMark).
-  //
-  // **`toggleCode`**`: MenuItem`
-  //   : A menu item to toggle the [code font mark](#schema-basic.CodeMark).
-  //
-  // **`toggleLink`**`: MenuItem`
-  //   : A menu item to toggle the [link mark](#schema-basic.LinkMark).
-  //
-  // **`insertImage`**`: MenuItem`
-  //   : A menu item to insert an [image](#schema-basic.Image).
-  //
-  // **`wrapBulletList`**`: MenuItem`
-  //   : A menu item to wrap the selection in a [bullet list](#schema-list.BulletList).
-  //
-  // **`wrapOrderedList`**`: MenuItem`
-  //   : A menu item to wrap the selection in an [ordered list](#schema-list.OrderedList).
-  //
-  // **`wrapBlockQuote`**`: MenuItem`
-  //   : A menu item to wrap the selection in a [block quote](#schema-basic.BlockQuote).
-  //
-  // **`makeParagraph`**`: MenuItem`
-  //   : A menu item to set the current textblock to be a normal
-  //     [paragraph](#schema-basic.Paragraph).
-  //
-  // **`makeCodeBlock`**`: MenuItem`
-  //   : A menu item to set the current textblock to be a
-  //     [code block](#schema-basic.CodeBlock).
-  //
-  // **`makeHead[N]`**`: MenuItem`
-  //   : Where _N_ is 1 to 6. Menu items to set the current textblock to
-  //     be a [heading](#schema-basic.Heading) of level _N_.
-  //
-  // **`insertHorizontalRule`**`: MenuItem`
-  //   : A menu item to insert a horizontal rule.
-  //
-  // The return value also contains some prefabricated menu elements and
-  // menus, that you can use instead of composing your own menu from
-  // scratch:
-  //
-  // **`insertMenu`**`: Dropdown`
-  //   : A dropdown containing the `insertImage` and
-  //     `insertHorizontalRule` items.
-  //
-  // **`typeMenu`**`: Dropdown`
-  //   : A dropdown containing the items for making the current
-  //     textblock a paragraph, code block, or heading.
-  //
-  // **`fullMenu`**`: [[MenuElement]]`
-  //   : An array of arrays of menu elements for use as the full menu
-  //     for, for example the [menu bar](https://github.com/prosemirror/prosemirror-menu#user-content-menubar).
-  function buildMenuItems(schema) {
-      let r = {},
-          type;
-      if (type = schema.marks.strong)
-          r.toggleStrong = markItem(type, {
-              title: "Toggle strong style",
-              icon: icons.strong
-          });
-      if (type = schema.marks.em)
-          r.toggleEm = markItem(type, {
-              title: "Toggle emphasis",
-              icon: icons.em
-          });
-      if (type = schema.marks.code)
-          r.toggleCode = markItem(type, {
-              title: "Toggle code font",
-              icon: icons.code
-          });
-      if (type = schema.marks.link)
-          r.toggleLink = linkItem(type);
-
-      if (type = schema.nodes.image)
-          r.insertImage = insertImageItem(type);
-      if (type = schema.nodes.bullet_list)
-          r.wrapBulletList = wrapListItem(type, {
-              title: "Wrap in bullet list",
-              icon: icons.bulletList
-          });
-      if (type = schema.nodes.ordered_list)
-          r.wrapOrderedList = wrapListItem(type, {
-              title: "Wrap in ordered list",
-              icon: icons.orderedList
-          });
-      if (type = schema.nodes.blockquote)
-          r.wrapBlockQuote = wrapItem(type, {
-              title: "Wrap in block quote",
-              icon: icons.blockquote
-          });
-      if (type = schema.nodes.paragraph)
-          r.makeParagraph = blockTypeItem(type, {
-              title: "Change to paragraph",
-              label: "Plain"
-          });
-      if (type = schema.nodes.code_block)
-          r.makeCodeBlock = blockTypeItem(type, {
-              title: "Change to code block",
-              label: "Code"
-          });
-      if (type = schema.nodes.heading)
-          for (let i = 1; i <= 10; i++)
-              r["makeHead" + i] = blockTypeItem(type, {
-                  title: "Change to heading " + i,
-                  label: "Level " + i,
-                  attrs: {
-                      level: i
-                  }
-              });
-      if (type = schema.nodes.horizontal_rule) {
-          let hr = type;
-          r.insertHorizontalRule = new MenuItem({
-              title: "Insert horizontal rule",
-              label: "Horizontal rule",
-              enable(state) {
-                  return canInsert(state, hr)
-              },
-              run(state, dispatch) {
-                  dispatch(state.tr.replaceSelectionWith(hr.create()));
-              }
-          });
-      }
-
-      let cut = arr => arr.filter(x => x);
-      r.insertMenu = new Dropdown(cut([r.insertImage, r.insertHorizontalRule]), {
-          label: "Insert"
-      });
-      r.typeMenu = new Dropdown(cut([r.makeParagraph, r.makeCodeBlock, r.makeHead1 && new DropdownSubmenu(cut([
-          r.makeHead1, r.makeHead2, r.makeHead3, r.makeHead4, r.makeHead5, r.makeHead6
-      ]), {
-          label: "Heading"
-      })]), {
-          label: "Type..."
-      });
-
-      r.inlineMenu = [cut([r.toggleStrong, r.toggleEm, r.toggleCode, r.toggleLink])];
-      r.blockMenu = [cut([r.wrapBulletList, r.wrapOrderedList, r.wrapBlockQuote, joinUpItem,
-          liftItem, selectParentNodeItem
-      ])];
-      r.fullMenu = r.inlineMenu.concat([
-          [r.insertMenu, r.typeMenu]
-      ], [
-          [undoItem, redoItem]
-      ], r.blockMenu);
-
-      return r
-  }
+  // :: Object
+  // Depending on the detected platform, this will hold
+  // [`pcBasekeymap`](#commands.pcBaseKeymap) or
+  // [`macBaseKeymap`](#commands.macBaseKeymap).
+  let baseKeymap = mac$2 ? macBaseKeymap : pcBaseKeymap;
 
   // ::- Input rules are regular expressions describing a piece of text
   // that, when typed, causes something to happen. This might be
@@ -14564,6 +13325,109 @@
       return keys
   }
 
+  // declare global: navigator
+
+  const mac$4 = typeof navigator != "undefined" ? /Mac/.test(navigator.platform) : false;
+
+  function normalizeKeyName$1(name) {
+      let parts = name.split(/-(?!$)/),
+          result = parts[parts.length - 1];
+      if (result == "Space") result = " ";
+      let alt, ctrl, shift, meta;
+      for (let i = 0; i < parts.length - 1; i++) {
+          let mod = parts[i];
+          if (/^(cmd|meta|m)$/i.test(mod)) meta = true;
+          else if (/^a(lt)?$/i.test(mod)) alt = true;
+          else if (/^(c|ctrl|control)$/i.test(mod)) ctrl = true;
+          else if (/^s(hift)?$/i.test(mod)) shift = true;
+          else if (/^mod$/i.test(mod)) {
+              if (mac$4) meta = true;
+              else ctrl = true;
+          } else throw new Error("Unrecognized modifier name: " + mod)
+      }
+      if (alt) result = "Alt-" + result;
+      if (ctrl) result = "Ctrl-" + result;
+      if (meta) result = "Meta-" + result;
+      if (shift) result = "Shift-" + result;
+      return result
+  }
+
+  function normalize$1(map) {
+      let copy = Object.create(null);
+      for (let prop in map) copy[normalizeKeyName$1(prop)] = map[prop];
+      return copy
+  }
+
+  function modifiers$1(name, event, shift) {
+      if (event.altKey) name = "Alt-" + name;
+      if (event.ctrlKey) name = "Ctrl-" + name;
+      if (event.metaKey) name = "Meta-" + name;
+      if (shift !== false && event.shiftKey) name = "Shift-" + name;
+      return name
+  }
+
+  // :: (Object) → Plugin
+  // Create a keymap plugin for the given set of bindings.
+  //
+  // Bindings should map key names to [command](#commands)-style
+  // functions, which will be called with `(EditorState, dispatch,
+  // EditorView)` arguments, and should return true when they've handled
+  // the key. Note that the view argument isn't part of the command
+  // protocol, but can be used as an escape hatch if a binding needs to
+  // directly interact with the UI.
+  //
+  // Key names may be strings like `"Shift-Ctrl-Enter"`—a key
+  // identifier prefixed with zero or more modifiers. Key identifiers
+  // are based on the strings that can appear in
+  // [`KeyEvent.key`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key).
+  // Use lowercase letters to refer to letter keys (or uppercase letters
+  // if you want shift to be held). You may use `"Space"` as an alias
+  // for the `" "` name.
+  //
+  // Modifiers can be given in any order. `Shift-` (or `s-`), `Alt-` (or
+  // `a-`), `Ctrl-` (or `c-` or `Control-`) and `Cmd-` (or `m-` or
+  // `Meta-`) are recognized. For characters that are created by holding
+  // shift, the `Shift-` prefix is implied, and should not be added
+  // explicitly.
+  //
+  // You can use `Mod-` as a shorthand for `Cmd-` on Mac and `Ctrl-` on
+  // other platforms.
+  //
+  // You can add multiple keymap plugins to an editor. The order in
+  // which they appear determines their precedence (the ones early in
+  // the array get to dispatch first).
+  function keymap(bindings) {
+      return new Plugin({
+          props: {
+              handleKeyDown: keydownHandler$1(bindings)
+          }
+      })
+  }
+
+  // :: (Object) → (view: EditorView, event: dom.Event) → bool
+  // Given a set of bindings (using the same format as
+  // [`keymap`](#keymap.keymap), return a [keydown
+  // handler](#view.EditorProps.handleKeyDown) that handles them.
+  function keydownHandler$1(bindings) {
+      let map = normalize$1(bindings);
+      return function(view, event) {
+          let name = keyName(event),
+              isChar = name.length == 1 && name != " ",
+              baseName;
+          let direct = map[modifiers$1(name, event, !isChar)];
+          if (direct && direct(view.state, view.dispatch, view)) return true
+          if (isChar && (event.shiftKey || event.altKey || event.metaKey) &&
+              (baseName = base_1[event.keyCode]) && baseName != name) {
+              let fromCode = map[modifiers$1(baseName, event, true)];
+              if (fromCode && fromCode(view.state, view.dispatch, view)) return true
+          } else if (isChar && event.shiftKey) {
+              let withShift = map[modifiers$1(name, event, true)];
+              if (withShift && withShift(view.state, view.dispatch, view)) return true
+          }
+          return false
+      }
+  }
+
   // : (NodeType) → InputRule
   // Given a blockquote node type, returns an input rule that turns `"> "`
   // at the start of a textblock into a blockquote.
@@ -14731,7 +13595,6 @@
                       attrs.className = dom.className;
                   }
 
-                  console.log(dom);
                   return attrs;
               }
           }],
@@ -15179,8 +14042,50 @@
 
   };
 
-  window.DOMinator = class DOMinator {
+  class DominatorMenu {
 
+      // items - menu items
+      // editorView -
+      // dom - menu div
+
+      constructor(items, editorView) {
+          
+          this.items = items;
+          this.editorView = editorView;
+
+          this.dom = document.createElement("div");
+          this.dom.className = "DOMinatorMenu";
+          items.forEach(({dom}) => this.dom.appendChild(dom));
+          this.update();
+
+          this.dom.addEventListener("mousedown", e => {
+              e.preventDefault();
+              this.editorView.focus();
+              items.forEach(({command, dom}) => {
+                  if (dom.contains(e.target)){
+                      command(this.editorView.state, this.editorView.dispatch, this.editorView);
+                  }
+              });
+          });
+      }
+
+      update() {
+          //console.log('update');
+          //console.log(this.editorView);
+          this.items.forEach(({command, dom}) => {
+              // let active = command(this.editorView.state, null, this.editorView);
+              // console.log(active);
+              // dom.style.display = active ? "" : "none";
+          });
+      }
+
+      destroy() { this.dom.remove(); }
+  }
+
+  window.DOMinator = class DOMinator {
+      // editorSchema
+      // editorView
+      // menuItems
       constructor(options) {
           // init options
           const defaults = {
@@ -15200,14 +14105,17 @@
           let nodes = addListNodes(schema.spec.nodes, "paragraph block*", "block");
           nodes = addListNodes(nodes, "paragraph block*", "block");
           nodes = this.addNodes(nodes, schemaDominator);
-          console.log(nodes);
+
           this.editorSchema = new Schema({
               nodes: nodes,
               marks: schema.spec.marks
           });
 
+          this.initMenu();
+          var that = this;
           // init view
-          this.view = new EditorView(document.querySelector("#editor"), {
+          this.editorView = new EditorView(document.querySelector("#editor"), {
+
               state: EditorState.create({
                   doc: DOMParser.fromSchema(this.editorSchema).parse(document.querySelector("#content")),
                   // plugins: exampleSetup({schema: this.editorSchema}),
@@ -15218,9 +14126,12 @@
                       dropCursor(),
                       gapCursor(),
                       history(),
-                      menuBar({
-                          floating: this.options.floatingMenu !== false,
-                          content: this.options.menuContent || buildMenuItems(this.editorSchema).fullMenu
+                      new Plugin({
+                          view(editorView) {
+                              let menuView = new DominatorMenu(that.menuItems, editorView);
+                              editorView.dom.parentNode.insertBefore(menuView.dom, editorView.dom);
+                              return menuView;
+                          }
                       }),
                       new Plugin({
                           props: {
@@ -15235,6 +14146,30 @@
           });
       }
 
+      initMenu(){
+          this.menuItems = [
+              {
+                  command: toggleMark(this.editorSchema.marks.strong),
+                  dom: this.icon("B", "strong")
+              },
+              {
+                  command: toggleMark(this.editorSchema.marks.em),
+                  dom: this.icon("i", "em")
+              },
+              {
+                  command: setBlockType(this.editorSchema.nodes.paragraph),
+                  dom: this.icon("p", "paragraph")
+              },
+              this.heading(1),
+              this.heading(2),
+              this.heading(3),
+              {
+                  command: wrapIn(this.editorSchema.nodes.blockquote),
+                  dom: this.icon(">", "blockquote")
+              }
+          ];
+      }
+
       addNodes(nodes, newNodes){
           Object.keys(newNodes).forEach(key => {
               nodes = nodes.addToEnd(key, newNodes[key]);
@@ -15243,7 +14178,29 @@
           return nodes;
       }
 
+      // Create an icon for a heading at the given level
+      heading(level) {
+          return {
+              command: setBlockType(this.editorSchema.nodes.heading, {
+                  level
+              }),
+              dom: this.icon("H" + level, "heading")
+          }
+      }
+
+      // Helper function to create menu icons
+      icon(text, name) {
+          let span = document.createElement("span");
+          span.className = "menuicon " + name;
+          span.title = name;
+          span.textContent = text;
+          return span;
+      }
+
   };
+
+
+
 
   // Mix the nodes from prosemirror-schema-list into the basic schema to
   // create a schema with list support.
