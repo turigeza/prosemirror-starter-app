@@ -14047,9 +14047,10 @@
       // items - menu items
       // editorView -
       // dom - menu div
+      // mousedown - true : false helps us debounce selection change
 
       constructor(items, editorView) {
-          
+
           this.items = items;
           this.editorView = editorView;
 
@@ -14067,9 +14068,54 @@
                   }
               });
           });
+
+          this.editorView.dom.addEventListener("mousedown", e => {
+              this.mousedown = true;
+          });
+          
+          this.editorView.dom.addEventListener("mouseup", e => {
+              this.mousedown = false;
+              this.update(this.editorView);
+          });
       }
 
-      update() {
+      update(view) {
+          if(this.mousedown){
+              return;
+          }
+          // console.dir(view);
+          // traverse(view)
+          if(view){
+              console.dir(view);
+              // console.log(view.lastSelectedViewDesc);
+              // console.log(JSON.stringify(view.state,  null, 4));
+              // console.log(view.state.selection);
+
+              // node is selected selection type is NodeSelection
+              // if(view.state.selection.node){
+              //     console.log(view.state.selection.constructor.name);
+              // }
+              // if(view){
+              //     console.log(view.state.selection.constructor.name);
+              // }
+
+              if(view.state.selection.constructor.name === 'NodeSelection'){
+                  console.log(view.state.selection.node);
+              }
+          }
+
+          // there is a selected node
+          if(view && view.lastSelectedViewDesc);
+
+          // console.log(JSON.stringify(view, null, 4));
+          // view.lastClick
+          // time: 1578571884813
+          // x: 580
+          // y: 297
+          // type: "singleClick"
+
+
+
           //console.log('update');
           //console.log(this.editorView);
           this.items.forEach(({command, dom}) => {
@@ -14079,7 +14125,11 @@
           });
       }
 
-      destroy() { this.dom.remove(); }
+      destroy() {
+          this.editorView.dom.removeEventListener("mouseup");
+          this.editorView.dom.removeEventListener("mousedown");
+          this.dom.remove();
+      }
   }
 
   window.DOMinator = class DOMinator {
