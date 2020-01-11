@@ -17,6 +17,7 @@ export default class DOMinatorMenu {
     // editorSchema
     // leftMenuDom
     // rightMenuDom
+    // submenus
 
     constructor(dominator, editorView) {
         this.dominator = dominator;
@@ -62,15 +63,23 @@ export default class DOMinatorMenu {
 
             // console.dir(view);
             console.dir(view.state.selection);
-            
+
             // make all submenues invisible then make the matching submenu visible
             Object.keys(this.submenus).forEach(key=>{
                 this.submenus[key].hide();
+                console.log('hidding');
             });
 
             if(view.state.selection.constructor.name === 'TextSelection'){
                 // watch out because text selection responds to none editable custom html selection as well
                 console.log('Text Selection');
+                if(view.state.selection.empty){
+
+                }else{
+                    // there is a selection show inline menu
+                    this.submenus.inline.show(view);
+                    console.log('showing');
+                }
             }else if (view.state.selection.constructor.name === 'NodeSelection'){
                 console.log('Node Selection');
             }

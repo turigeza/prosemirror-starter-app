@@ -197,8 +197,10 @@ export default {
         content: "block+",
         group: "block",
         defining: true,
-        draggable: false,
         selectable: true,
+        // atom: true,
+        draggable: false,
+        // isolating: true,
         attrs: {
             dom: {
                 default: {}
@@ -227,6 +229,7 @@ export default {
             // n.innerHtml = 'Heyho';
             // console.log(n)
             let newClone = node.attrs.dom.cloneNode(true)
+            // newClone.addEventListener("click", ()=>{ console.log('mouseup');}
             return newClone;
 
         }
