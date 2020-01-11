@@ -1,19 +1,114 @@
 .DOMinatorMenu{
-    background-color: red;
+    background-color: white;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: 50px;
+    /* height: 50px; */
+
+    z-index: 100;
+    border-bottom: 2px solid #eee;
+    box-shadow: 0 5px 10px -5px rgba(0,0,0,0.1);;
+    height: 45px;
+    overflow-y: hidden;
 }
-.DOMinatorMenu .menuicon{
-    padding: 15px;
-    text-transform: capitalize;
-    background-color: white;
-    display: inline-block;
+
+body.dominatorMenuActive{
+    margin-top: 50px;
 }
-.DOMinatorMenu .menuicon:hover{
-    background-color: #eee;
+.DOMinatorSubMenu{
+    outline: 1px solid pink;
+    outline: none;
+    outline-offset: -1px;
+    display: flex;
+}
+.DOMinatorMenuButton{
     pointer-events: all;
+    border: none;
+    outline: none;
+    border-radius: 0;
+    margin: 0;
+    width: auto;
+    overflow: visible;
+
+    text-align: center;
+    font: inherit;
+
+    -webkit-font-smoothing: inherit;
+    -moz-osx-font-smoothing: inherit;
+    -webkit-appearance: none;
+
+    font-size: 18px;
+    padding:  0px 13px;
+    height: 45px;
+    background-color: white;
     cursor: pointer;
+    color: #222;
+
+}
+.DOMinatorMenuButton:active, .DOMinatorMenuButton:hover{
+    color: #009CDE;
+    background-color: #eee;
+}
+
+.DOMinatorMenuButton-link_style_default, .DOMinatorMenuButton-link_style_default:active{
+    color: #999;
+}
+.DOMinatorMenuButton-link_style_warning, .DOMinatorMenuButton-link_style_warning:active{
+    color: #ff7518;
+}
+.DOMinatorMenuButton-link_style_danger, .DOMinatorMenuButton-link_style_danger:active{
+    color: #b1000b;
+}
+.DOMinatorMenuButton-link_style_primary, .DOMinatorMenuButton-link_style_primary:active{
+    color: #009CDE;
+}
+.DOMinatorMenuButton-link_style_success, .DOMinatorMenuButton-link_style_success:active{
+    color: #509E2F;
+}
+.DOMinatorMenuButton-link_style_info, .DOMinatorMenuButton-link_style_info:active{
+    color: #5936e0;
+}
+.DOMinatorMenuInput{
+    /* resets */
+    margin:0;
+	display:inline-block;
+	vertical-align:middle;
+	white-space:normal;
+	background:none;
+	line-height:1;
+	font-size:13px;
+	font-family:Arial;
+    background-image:none;
+    background-color:white;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    box-sizing: border-box;
+    border: none;
+    border-collapse: collapse;
+
+    padding: 0;
+    height: 45px;
+    min-width: 280px;
+    background-color: #eee;
+    font-size: 14px;
+    padding-left: 15px;
+    color: #009CDE;
+}
+.DOMinatorMenuInput:focus{
+    outline: none;
+    border-left: 3px solid #009CDE;
+}
+.DOMinatorMenuInput::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #bbb;
+}
+.DOMinatorMenuInput::-moz-placeholder { /* Firefox 19+ */
+  color: #bbb;
+}
+.DOMinatorMenuInput:-ms-input-placeholder { /* IE 10+ */
+  color: #bbb;
+}
+.DOMinatorMenuInput:-moz-placeholder { /* Firefox 18- */
+  color: #bbb;
 }

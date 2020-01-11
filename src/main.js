@@ -10,14 +10,14 @@ import {dropCursor} from "prosemirror-dropcursor"
 import {gapCursor} from "prosemirror-gapcursor"
 // import {menuBar} from "prosemirror-menu"
 
-import {baseKeymap, toggleMark, setBlockType, wrapIn} from "./commands"
+
 //import {buildMenuItems} from "./menu"
 import {buildKeymap} from "./keymap"
 import {keymap} from "./prosemirror-keymap"
 import {buildInputRules} from "./inputrules"
 import {schema} from "./schema-basic"
 import schemaDominator from "./schema-dominator"
-import {DominatorMenu} from "./dominatormenu"
+import DOMinatorMenu from "./DOMinatorMenu"
 
 
 window.DOMinator = class DOMinator {
@@ -49,7 +49,6 @@ window.DOMinator = class DOMinator {
             marks: schema.spec.marks
         })
 
-        this.initMenu();
         var that = this;
         // init view
         this.editorView = new EditorView(document.querySelector("#editor"), {
@@ -60,13 +59,13 @@ window.DOMinator = class DOMinator {
                 plugins: [
                     buildInputRules(this.editorSchema),
                     keymap(buildKeymap(this.editorSchema, this.options.mapKeys)),
-                    keymap(baseKeymap),
+                    keymap(),
                     dropCursor(),
                     gapCursor(),
                     history(),
                     new Plugin({
                         view(editorView) {
-                            let menuView = new DominatorMenu(that.menuItems, editorView);
+                            let menuView = new DOMinatorMenu(that, editorView);
                             editorView.dom.parentNode.insertBefore(menuView.dom, editorView.dom);
                             return menuView;
                         }
@@ -84,30 +83,6 @@ window.DOMinator = class DOMinator {
         })
     }
 
-    initMenu(){
-        this.menuItems = [
-            {
-                command: toggleMark(this.editorSchema.marks.strong),
-                dom: this.icon("B", "strong")
-            },
-            {
-                command: toggleMark(this.editorSchema.marks.em),
-                dom: this.icon("i", "em")
-            },
-            {
-                command: setBlockType(this.editorSchema.nodes.paragraph),
-                dom: this.icon("p", "paragraph")
-            },
-            this.heading(1),
-            this.heading(2),
-            this.heading(3),
-            {
-                command: wrapIn(this.editorSchema.nodes.blockquote),
-                dom: this.icon(">", "blockquote")
-            }
-        ];
-    }
-
     addNodes(nodes, newNodes){
         Object.keys(newNodes).forEach(key => {
             nodes = nodes.addToEnd(key, newNodes[key]);
@@ -116,24 +91,7 @@ window.DOMinator = class DOMinator {
         return nodes;
     }
 
-    // Create an icon for a heading at the given level
-    heading(level) {
-        return {
-            command: setBlockType(this.editorSchema.nodes.heading, {
-                level
-            }),
-            dom: this.icon("H" + level, "heading")
-        }
-    }
 
-    // Helper function to create menu icons
-    icon(text, name) {
-        let span = document.createElement("span")
-        span.className = "menuicon " + name
-        span.title = name
-        span.textContent = text
-        return span;
-    }
 
 }
 

@@ -12429,185 +12429,6 @@
   //# sourceMappingURL=index.es.js.map
 
   // :: (EditorState, ?(tr: Transaction)) → bool
-  // Delete the selection, if there is one.
-
-  function deleteSelection(state, dispatch) {
-      if (state.selection.empty) return false
-      if (dispatch) dispatch(state.tr.deleteSelection().scrollIntoView());
-      return true
-  }
-
-  // :: (EditorState, ?(tr: Transaction), ?EditorView) → bool
-  // If the selection is empty and at the start of a textblock, try to
-  // reduce the distance between that block and the one before it—if
-  // there's a block directly before it that can be joined, join them.
-  // If not, try to move the selected block closer to the next one in
-  // the document structure by lifting it out of its parent or moving it
-  // into a parent of the previous block. Will use the view for accurate
-  // (bidi-aware) start-of-textblock detection if given.
-  function joinBackward(state, dispatch, view) {
-      let {
-          $cursor
-      } = state.selection;
-      if (!$cursor || (view ? !view.endOfTextblock("backward", state) :
-              $cursor.parentOffset > 0))
-          return false
-
-      let $cut = findCutBefore($cursor);
-
-      // If there is no node before this, try to lift
-      if (!$cut) {
-          let range = $cursor.blockRange(),
-              target = range && liftTarget(range);
-          if (target == null) return false
-          if (dispatch) dispatch(state.tr.lift(range, target).scrollIntoView());
-          return true
-      }
-
-      let before = $cut.nodeBefore;
-      // Apply the joining algorithm
-      if (!before.type.spec.isolating && deleteBarrier(state, $cut, dispatch))
-          return true
-
-      // If the node below has no content and the node above is
-      // selectable, delete the node below and select the one above.
-      if ($cursor.parent.content.size == 0 &&
-          (textblockAt(before, "end") || NodeSelection.isSelectable(before))) {
-          if (dispatch) {
-              let tr = state.tr.deleteRange($cursor.before(), $cursor.after());
-              tr.setSelection(textblockAt(before, "end") ? Selection.findFrom(tr.doc.resolve(tr.mapping.map($cut.pos, -1)), -1) :
-                  NodeSelection.create(tr.doc, $cut.pos - before.nodeSize));
-              dispatch(tr.scrollIntoView());
-          }
-          return true
-      }
-
-      // If the node before is an atom, delete it
-      if (before.isAtom && $cut.depth == $cursor.depth - 1) {
-          if (dispatch) dispatch(state.tr.delete($cut.pos - before.nodeSize, $cut.pos).scrollIntoView());
-          return true
-      }
-
-      return false
-  }
-
-  function textblockAt(node, side) {
-      for (; node; node = (side == "start" ? node.firstChild : node.lastChild))
-          if (node.isTextblock) return true
-      return false
-  }
-
-  // :: (EditorState, ?(tr: Transaction), ?EditorView) → bool
-  // When the selection is empty and at the start of a textblock, select
-  // the node before that textblock, if possible. This is intended to be
-  // bound to keys like backspace, after
-  // [`joinBackward`](#commands.joinBackward) or other deleting
-  // commands, as a fall-back behavior when the schema doesn't allow
-  // deletion at the selected point.
-  function selectNodeBackward(state, dispatch, view) {
-      let {
-          $cursor
-      } = state.selection;
-      if (!$cursor || (view ? !view.endOfTextblock("backward", state) :
-              $cursor.parentOffset > 0))
-          return false
-
-      let $cut = findCutBefore($cursor),
-          node = $cut && $cut.nodeBefore;
-      if (!node || !NodeSelection.isSelectable(node)) return false
-      if (dispatch)
-          dispatch(state.tr.setSelection(NodeSelection.create(state.doc, $cut.pos - node.nodeSize)).scrollIntoView());
-      return true
-  }
-
-  function findCutBefore($pos) {
-      if (!$pos.parent.type.spec.isolating)
-          for (let i = $pos.depth - 1; i >= 0; i--) {
-              if ($pos.index(i) > 0) return $pos.doc.resolve($pos.before(i + 1))
-              if ($pos.node(i).type.spec.isolating) break
-          }
-      return null
-  }
-
-  // :: (EditorState, ?(tr: Transaction), ?EditorView) → bool
-  // If the selection is empty and the cursor is at the end of a
-  // textblock, try to reduce or remove the boundary between that block
-  // and the one after it, either by joining them or by moving the other
-  // block closer to this one in the tree structure. Will use the view
-  // for accurate start-of-textblock detection if given.
-  function joinForward(state, dispatch, view) {
-      let {
-          $cursor
-      } = state.selection;
-      if (!$cursor || (view ? !view.endOfTextblock("forward", state) :
-              $cursor.parentOffset < $cursor.parent.content.size))
-          return false
-
-      let $cut = findCutAfter($cursor);
-
-      // If there is no node after this, there's nothing to do
-      if (!$cut) return false
-
-      let after = $cut.nodeAfter;
-      // Try the joining algorithm
-      if (deleteBarrier(state, $cut, dispatch)) return true
-
-      // If the node above has no content and the node below is
-      // selectable, delete the node above and select the one below.
-      if ($cursor.parent.content.size == 0 &&
-          (textblockAt(after, "start") || NodeSelection.isSelectable(after))) {
-          if (dispatch) {
-              let tr = state.tr.deleteRange($cursor.before(), $cursor.after());
-              tr.setSelection(textblockAt(after, "start") ? Selection.findFrom(tr.doc.resolve(tr.mapping.map($cut.pos)), 1) :
-                  NodeSelection.create(tr.doc, tr.mapping.map($cut.pos)));
-              dispatch(tr.scrollIntoView());
-          }
-          return true
-      }
-
-      // If the next node is an atom, delete it
-      if (after.isAtom && $cut.depth == $cursor.depth - 1) {
-          if (dispatch) dispatch(state.tr.delete($cut.pos, $cut.pos + after.nodeSize).scrollIntoView());
-          return true
-      }
-
-      return false
-  }
-
-  // :: (EditorState, ?(tr: Transaction), ?EditorView) → bool
-  // When the selection is empty and at the end of a textblock, select
-  // the node coming after that textblock, if possible. This is intended
-  // to be bound to keys like delete, after
-  // [`joinForward`](#commands.joinForward) and similar deleting
-  // commands, to provide a fall-back behavior when the schema doesn't
-  // allow deletion at the selected point.
-  function selectNodeForward(state, dispatch, view) {
-      let {
-          $cursor
-      } = state.selection;
-      if (!$cursor || (view ? !view.endOfTextblock("forward", state) :
-              $cursor.parentOffset < $cursor.parent.content.size))
-          return false
-
-      let $cut = findCutAfter($cursor),
-          node = $cut && $cut.nodeAfter;
-      if (!node || !NodeSelection.isSelectable(node)) return false
-      if (dispatch)
-          dispatch(state.tr.setSelection(NodeSelection.create(state.doc, $cut.pos)).scrollIntoView());
-      return true
-  }
-
-  function findCutAfter($pos) {
-      if (!$pos.parent.type.spec.isolating)
-          for (let i = $pos.depth - 1; i >= 0; i--) {
-              let parent = $pos.node(i);
-              if ($pos.index(i) + 1 < parent.childCount) return $pos.doc.resolve($pos.after(i + 1))
-              if (parent.type.spec.isolating) break
-          }
-      return null
-  }
-
-  // :: (EditorState, ?(tr: Transaction)) → bool
   // Join the selected block or, if there is a text selection, the
   // closest ancestor block of the selection that can be joined, with
   // the sibling above it.
@@ -12663,20 +12484,6 @@
       return true
   }
 
-  // :: (EditorState, ?(tr: Transaction)) → bool
-  // If the selection is in a node whose type has a truthy
-  // [`code`](#model.NodeSpec.code) property in its spec, replace the
-  // selection with a newline character.
-  function newlineInCode(state, dispatch) {
-      let {
-          $head,
-          $anchor
-      } = state.selection;
-      if (!$head.parent.type.spec.code || !$head.sameParent($anchor)) return false
-      if (dispatch) dispatch(state.tr.insertText("\n").scrollIntoView());
-      return true
-  }
-
   function defaultBlockAt(match) {
       for (let i = 0; i < match.edgeCount; i++) {
           let {
@@ -12711,92 +12518,6 @@
   }
 
   // :: (EditorState, ?(tr: Transaction)) → bool
-  // If a block node is selected, create an empty paragraph before (if
-  // it is its parent's first child) or after it.
-  function createParagraphNear(state, dispatch) {
-      let {
-          $from,
-          $to
-      } = state.selection;
-      if ($from.parent.inlineContent || $to.parent.inlineContent) return false
-      let type = defaultBlockAt($from.parent.contentMatchAt($to.indexAfter()));
-      if (!type || !type.isTextblock) return false
-      if (dispatch) {
-          let side = (!$from.parentOffset && $to.index() < $to.parent.childCount ? $from : $to).pos;
-          let tr = state.tr.insert(side, type.createAndFill());
-          tr.setSelection(TextSelection.create(tr.doc, side + 1));
-          dispatch(tr.scrollIntoView());
-      }
-      return true
-  }
-
-  // :: (EditorState, ?(tr: Transaction)) → bool
-  // If the cursor is in an empty textblock that can be lifted, lift the
-  // block.
-  function liftEmptyBlock(state, dispatch) {
-      let {
-          $cursor
-      } = state.selection;
-      if (!$cursor || $cursor.parent.content.size) return false
-      if ($cursor.depth > 1 && $cursor.after() != $cursor.end(-1)) {
-          let before = $cursor.before();
-          if (canSplit(state.doc, before)) {
-              if (dispatch) dispatch(state.tr.split(before).scrollIntoView());
-              return true
-          }
-      }
-      let range = $cursor.blockRange(),
-          target = range && liftTarget(range);
-      if (target == null) return false
-      if (dispatch) dispatch(state.tr.lift(range, target).scrollIntoView());
-      return true
-  }
-
-  // :: (EditorState, ?(tr: Transaction)) → bool
-  // Split the parent block of the selection. If the selection is a text
-  // selection, also delete its content.
-  function splitBlock(state, dispatch) {
-      let {
-          $from,
-          $to
-      } = state.selection;
-      if (state.selection instanceof NodeSelection && state.selection.node.isBlock) {
-          if (!$from.parentOffset || !canSplit(state.doc, $from.pos)) return false
-          if (dispatch) dispatch(state.tr.split($from.pos).scrollIntoView());
-          return true
-      }
-
-      if (!$from.parent.isBlock) return false
-
-      if (dispatch) {
-          let atEnd = $to.parentOffset == $to.parent.content.size;
-          let tr = state.tr;
-          if (state.selection instanceof TextSelection) tr.deleteSelection();
-          let deflt = $from.depth == 0 ? null : defaultBlockAt($from.node(-1).contentMatchAt($from.indexAfter(-1)));
-          let types = atEnd && deflt ? [{
-              type: deflt
-          }] : null;
-          let can = canSplit(tr.doc, tr.mapping.map($from.pos), 1, types);
-          if (!types && !can && canSplit(tr.doc, tr.mapping.map($from.pos), 1, deflt && [{
-                  type: deflt
-              }])) {
-              types = [{
-                  type: deflt
-              }];
-              can = true;
-          }
-          if (can) {
-              tr.split(tr.mapping.map($from.pos), 1, types);
-              if (!atEnd && !$from.parentOffset && $from.parent.type != deflt &&
-                  $from.node(-1).canReplace($from.index(-1), $from.indexAfter(-1), Fragment.from(deflt.create(), $from.parent)))
-                  tr.setNodeMarkup(tr.mapping.map($from.before()), deflt);
-          }
-          dispatch(tr.scrollIntoView());
-      }
-      return true
-  }
-
-  // :: (EditorState, ?(tr: Transaction)) → bool
   // Move the selection to the node wrapping the current selection, if
   // any. (Will not select the document node.)
   function selectParentNode(state, dispatch) {
@@ -12809,67 +12530,6 @@
       pos = $from.before(same);
       if (dispatch) dispatch(state.tr.setSelection(NodeSelection.create(state.doc, pos)));
       return true
-  }
-
-  // :: (EditorState, ?(tr: Transaction)) → bool
-  // Select the whole document.
-  function selectAll(state, dispatch) {
-      if (dispatch) dispatch(state.tr.setSelection(new AllSelection(state.doc)));
-      return true
-  }
-
-  function joinMaybeClear(state, $pos, dispatch) {
-      let before = $pos.nodeBefore,
-          after = $pos.nodeAfter,
-          index = $pos.index();
-      if (!before || !after || !before.type.compatibleContent(after.type)) return false
-      if (!before.content.size && $pos.parent.canReplace(index - 1, index)) {
-          if (dispatch) dispatch(state.tr.delete($pos.pos - before.nodeSize, $pos.pos).scrollIntoView());
-          return true
-      }
-      if (!$pos.parent.canReplace(index, index + 1) || !(after.isTextblock || canJoin(state.doc, $pos.pos)))
-          return false
-      if (dispatch)
-          dispatch(state.tr
-              .clearIncompatible($pos.pos, before.type, before.contentMatchAt(before.childCount))
-              .join($pos.pos)
-              .scrollIntoView());
-      return true
-  }
-
-  function deleteBarrier(state, $cut, dispatch) {
-      let before = $cut.nodeBefore,
-          after = $cut.nodeAfter,
-          conn, match;
-      if (before.type.spec.isolating || after.type.spec.isolating) return false
-      if (joinMaybeClear(state, $cut, dispatch)) return true
-
-      if ($cut.parent.canReplace($cut.index(), $cut.index() + 1) &&
-          (conn = (match = before.contentMatchAt(before.childCount)).findWrapping(after.type)) &&
-          match.matchType(conn[0] || after.type).validEnd) {
-          if (dispatch) {
-              let end = $cut.pos + after.nodeSize,
-                  wrap = Fragment.empty;
-              for (let i = conn.length - 1; i >= 0; i--)
-                  wrap = Fragment.from(conn[i].create(null, wrap));
-              wrap = Fragment.from(before.copy(wrap));
-              let tr = state.tr.step(new ReplaceAroundStep($cut.pos - 1, end, $cut.pos, end, new Slice(wrap, 1, 0), conn.length, true));
-              let joinAt = end + 2 * conn.length;
-              if (canJoin(tr.doc, joinAt)) tr.join(joinAt);
-              dispatch(tr.scrollIntoView());
-          }
-          return true
-      }
-
-      let selAfter = Selection.findFrom($cut, 1);
-      let range = selAfter && selAfter.$from.blockRange(selAfter.$to),
-          target = range && liftTarget(range);
-      if (target != null && target >= $cut.depth) {
-          if (dispatch) dispatch(state.tr.lift(range, target).scrollIntoView());
-          return true
-      }
-
-      return false
   }
 
   // Parameterized commands
@@ -13003,54 +12663,9 @@
       }
   }
 
-  let backspace = chainCommands(deleteSelection, joinBackward, selectNodeBackward);
-  let del = chainCommands(deleteSelection, joinForward, selectNodeForward);
-
-  // :: Object
-  // A basic keymap containing bindings not specific to any schema.
-  // Binds the following keys (when multiple commands are listed, they
-  // are chained with [`chainCommands`](#commands.chainCommands)):
-  //
-  // * **Enter** to `newlineInCode`, `createParagraphNear`, `liftEmptyBlock`, `splitBlock`
-  // * **Mod-Enter** to `exitCode`
-  // * **Backspace** and **Mod-Backspace** to `deleteSelection`, `joinBackward`, `selectNodeBackward`
-  // * **Delete** and **Mod-Delete** to `deleteSelection`, `joinForward`, `selectNodeForward`
-  // * **Mod-Delete** to `deleteSelection`, `joinForward`, `selectNodeForward`
-  // * **Mod-a** to `selectAll`
-  let pcBaseKeymap = {
-      "Enter": chainCommands(newlineInCode, createParagraphNear, liftEmptyBlock, splitBlock),
-      "Mod-Enter": exitCode,
-      "Backspace": backspace,
-      "Mod-Backspace": backspace,
-      "Delete": del,
-      "Mod-Delete": del,
-      "Mod-a": selectAll
-  };
-
-  // :: Object
-  // A copy of `pcBaseKeymap` that also binds **Ctrl-h** like Backspace,
-  // **Ctrl-d** like Delete, **Alt-Backspace** like Ctrl-Backspace, and
-  // **Ctrl-Alt-Backspace**, **Alt-Delete**, and **Alt-d** like
-  // Ctrl-Delete.
-  let macBaseKeymap = {
-      "Ctrl-h": pcBaseKeymap["Backspace"],
-      "Alt-Backspace": pcBaseKeymap["Mod-Backspace"],
-      "Ctrl-d": pcBaseKeymap["Delete"],
-      "Ctrl-Alt-Backspace": pcBaseKeymap["Mod-Delete"],
-      "Alt-Delete": pcBaseKeymap["Mod-Delete"],
-      "Alt-d": pcBaseKeymap["Mod-Delete"]
-  };
-  for (let key in pcBaseKeymap) macBaseKeymap[key] = pcBaseKeymap[key];
-
   // declare global: os, navigator
   const mac$2 = typeof navigator != "undefined" ? /Mac/.test(navigator.platform) :
       typeof os != "undefined" ? os.platform() == "darwin" : false;
-
-  // :: Object
-  // Depending on the detected platform, this will hold
-  // [`pcBasekeymap`](#commands.pcBaseKeymap) or
-  // [`macBaseKeymap`](#commands.macBaseKeymap).
-  let baseKeymap = mac$2 ? macBaseKeymap : pcBaseKeymap;
 
   // ::- Input rules are regular expressions describing a piece of text
   // that, when typed, causes something to happen. This might be
@@ -14042,37 +13657,157 @@
 
   };
 
-  class DominatorMenu {
+  class DOMinatorMenuButton {
+      // dom
+      // options
+      //
+
+      constructor(options) {
+          this.options = options;
+          this.dom = document.createElement("button");
+          this.dom.className = "DOMinatorMenuButton DOMinatorMenuButton-"+this.options.key;
+          //document.createTextNode("Hello World");
+          if(this.options.icon){
+              if(typeof this.options.icon === 'string'){
+                  let icon = document.createElement("i");
+                  icon.className = 'fa fa-'+this.options.icon;
+                  icon.setAttribute('aria-hidden', 'true');
+                  this.dom.appendChild(icon);
+              }
+          }
+      }
+
+      update(){
+          if(typeof this.options.update === 'function'){
+              this.options.update();
+          }
+      }
+
+      destroy() {
+
+      }
+
+      getDom(){
+          return this.dom;
+      }
+
+      setParent(parent){
+          this.parent = parent;
+      }
+  }
+
+  class DOMinatorMenuInput {
+
+      // dom - the dom element for this submenu
+      // options
+
+      constructor(options) {
+          this.options = options;
+          this.dom = document.createElement("input");
+          this.dom.className = "DOMinatorMenuInput DOMinatorMenuInput-"+this.options.key;
+
+
+          this.dom.setAttribute('placeholder', options.placeholder || 'More tea Vicar ... ?');
+      }
+
+      update(){
+          this.items.forEach(item=>{
+              if(typeof item.update === 'function'){
+                  item.update();
+              }
+          });
+      }
+
+      setParent(parent){
+          this.parent = parent;
+      }
+
+      getDom(){
+          return this.dom;
+      }
+
+      destroy() {
+          this.dom.remove();
+      }
+  }
+
+  class DOMinatorSubMenu {
+
+      // items - the menu items
+      // dom - the dom element for this submenu
+      // options
+      constructor(options) {
+          this.options = options;
+          this.items = options.items;
+          this.dom = document.createElement("div");
+          this.dom.className = "DOMinatorSubMenu DOMinatorSubMenu-"+this.options.key;
+
+          this.items.forEach(item=>{
+              this.dom.appendChild( item.getDom() );
+              item.setParent(this);
+          });
+      }
+
+      update(){
+          this.items.forEach(item=>{
+              if(typeof item.update === 'function'){
+                  item.update();
+              }
+          });
+      }
+
+      hide(){
+          this.dom.style.display = "none";
+      }
+
+      show(){
+          this.dom.style.display = "";
+      }
+
+      getDom(){
+          return this.dom;
+      }
+
+      destroy() {
+          this.dom.remove();
+      }
+  }
+
+  class DOMinatorMenu {
 
       // items - menu items
       // editorView -
       // dom - menu div
       // mousedown - true : false helps us debounce selection change
+      // dominator
+      // editorSchema
+      // leftMenuDom
+      // rightMenuDom
 
-      constructor(items, editorView) {
+      constructor(dominator, editorView) {
+          this.dominator = dominator;
 
-          this.items = items;
           this.editorView = editorView;
+          this.editorSchema = dominator.editorSchema;
 
-          this.dom = document.createElement("div");
-          this.dom.className = "DOMinatorMenu";
-          items.forEach(({dom}) => this.dom.appendChild(dom));
+          this.initMenu();
+
           this.update();
-
-          this.dom.addEventListener("mousedown", e => {
-              e.preventDefault();
-              this.editorView.focus();
-              items.forEach(({command, dom}) => {
-                  if (dom.contains(e.target)){
-                      command(this.editorView.state, this.editorView.dispatch, this.editorView);
-                  }
-              });
-          });
+          document.body.classList.add("dominatorMenuActive");
+          // this.dom.addEventListener("mousedown", e => {
+          //     e.preventDefault()
+          //     this.editorView.focus()
+          //     // this.items.forEach(({command, dom}) => {
+          //     //     if (dom.contains(e.target)){
+          //     //         command(this.editorView.state, this.editorView.dispatch, this.editorView);
+          //     //     }
+          //     // })
+          // })
 
           this.editorView.dom.addEventListener("mousedown", e => {
               this.mousedown = true;
           });
-          
+
           this.editorView.dom.addEventListener("mouseup", e => {
               this.mousedown = false;
               this.update(this.editorView);
@@ -14083,11 +13818,31 @@
           if(this.mousedown){
               return;
           }
+
           // console.dir(view);
           // traverse(view)
           if(view){
-              console.dir(view);
-              // console.log(view.lastSelectedViewDesc);
+              if(!view){
+                  return;
+              }
+
+              // console.dir(view);
+              console.dir(view.state.selection);
+              
+              // make all submenues invisible then make the matching submenu visible
+              Object.keys(this.submenus).forEach(key=>{
+                  this.submenus[key].hide();
+              });
+
+              if(view.state.selection.constructor.name === 'TextSelection'){
+                  // watch out because text selection responds to none editable custom html selection as well
+                  console.log('Text Selection');
+              }else if (view.state.selection.constructor.name === 'NodeSelection'){
+                  console.log('Node Selection');
+              }
+
+
+
               // console.log(JSON.stringify(view.state,  null, 4));
               // console.log(view.state.selection);
 
@@ -14099,9 +13854,7 @@
               //     console.log(view.state.selection.constructor.name);
               // }
 
-              if(view.state.selection.constructor.name === 'NodeSelection'){
-                  console.log(view.state.selection.node);
-              }
+
           }
 
           // there is a selected node
@@ -14118,11 +13871,209 @@
 
           //console.log('update');
           //console.log(this.editorView);
-          this.items.forEach(({command, dom}) => {
-              // let active = command(this.editorView.state, null, this.editorView);
-              // console.log(active);
-              // dom.style.display = active ? "" : "none";
+          // this.items.forEach(({command, dom}) => {
+          //     // let active = command(this.editorView.state, null, this.editorView);
+          //     // console.log(active);
+          //     // dom.style.display = active ? "" : "none";
+          // })
+      }
+
+      initMenu(){
+          // this.items = [
+          //     {
+          //         command: toggleMark(this.editorSchema.marks.strong),
+          //         dom: this.icon("B", "strong")
+          //     },
+          //     {
+          //         command: toggleMark(this.editorSchema.marks.em),
+          //         dom: this.icon("i", "em")
+          //     },
+          //     {
+          //         command: setBlockType(this.editorSchema.nodes.paragraph),
+          //         dom: this.icon("p", "paragraph")
+          //     },
+          //     this.heading(1),
+          //     this.heading(2),
+          //     this.heading(3),
+          //     {
+          //         command: wrapIn(this.editorSchema.nodes.blockquote),
+          //         dom: this.icon(">", "blockquote")
+          //     }
+          // ];
+
+          let align_center = { key: 'align_center', icon: 'align-center', command: toggleMark(this.editorSchema.marks.strong) };
+          let align_left = { key: 'align_left', icon: 'align-left', command: toggleMark(this.editorSchema.marks.strong) };
+          let align_right = { key: 'align_right', icon: 'align-right', command: toggleMark(this.editorSchema.marks.strong) };
+
+          this.submenus = {
+              inline: new DOMinatorSubMenu({
+                  key: 'inline',
+                  items: [
+                      new DOMinatorMenuButton ({
+                          key: 'bold',
+                          icon: 'bold',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'italic',
+                          icon: 'italic',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'underline',
+                          icon: 'underline',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'link',
+                          icon: 'link',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'strikethrough',
+                          icon: 'strikethrough',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'subscript',
+                          icon: 'subscript',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'superscript',
+                          icon: 'superscript',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'remove_formatting',
+                          icon: 'eraser',
+
+                      }),
+                  ]
+              }),
+              a: new DOMinatorSubMenu({
+                  key: 'a',
+                  items: [
+                      new DOMinatorMenuInput ({
+                          key: 'href',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'unlink',
+                          icon: 'chain-broken',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'link_external',
+                          icon: 'external-link',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'link_style_default',
+                          icon: 'paint-brush',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'link_style_primary',
+                          icon: 'paint-brush',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'link_style_warning',
+                          icon: 'paint-brush',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'link_style_danger',
+                          icon: 'paint-brush',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'link_style_success',
+                          icon: 'paint-brush',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'link_style_info',
+                          icon: 'paint-brush',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                  ]
+              }),
+              paragraph: new DOMinatorSubMenu({
+                  key: 'paragraph',
+                  items: [
+                      new DOMinatorMenuButton ({
+                          key: 'outdent',
+                          icon: 'outdent',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'indent',
+                          icon: 'indent',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'list_ul',
+                          icon: 'list-ul',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'list_ol',
+                          icon: 'list-ol',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'paragraph',
+                          icon: 'paragraph',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'undo',
+                          icon: 'undo',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'redo',
+                          icon: 'repeat',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'layouts',
+                          icon: 'columns',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                  ]
+              })
+          };
+
+          this.dom = document.createElement("div");
+          this.dom.className = "DOMinatorMenu";
+
+          Object.keys(this.submenus).forEach(key=>{
+              this.dom.appendChild( this.submenus[key].getDom() );
           });
+
+          // this.items.forEach(({dom}) => this.dom.appendChild(dom))
+      }
+
+      // Create an icon for a heading at the given level
+      heading(level) {
+          return {
+              command: setBlockType(this.editorSchema.nodes.heading, {
+                  level
+              }),
+              dom: this.icon("H" + level, "heading")
+          }
+      }
+
+      // Helper function to create menu icons
+      icon(text, name) {
+          let span = document.createElement("span");
+          span.className = "menuicon " + name;
+          span.title = name;
+          span.textContent = text;
+          return span;
       }
 
       destroy() {
@@ -14161,7 +14112,6 @@
               marks: schema.spec.marks
           });
 
-          this.initMenu();
           var that = this;
           // init view
           this.editorView = new EditorView(document.querySelector("#editor"), {
@@ -14172,13 +14122,13 @@
                   plugins: [
                       buildInputRules(this.editorSchema),
                       keymap(buildKeymap(this.editorSchema, this.options.mapKeys)),
-                      keymap(baseKeymap),
+                      keymap(),
                       dropCursor(),
                       gapCursor(),
                       history(),
                       new Plugin({
                           view(editorView) {
-                              let menuView = new DominatorMenu(that.menuItems, editorView);
+                              let menuView = new DOMinatorMenu(that, editorView);
                               editorView.dom.parentNode.insertBefore(menuView.dom, editorView.dom);
                               return menuView;
                           }
@@ -14196,30 +14146,6 @@
           });
       }
 
-      initMenu(){
-          this.menuItems = [
-              {
-                  command: toggleMark(this.editorSchema.marks.strong),
-                  dom: this.icon("B", "strong")
-              },
-              {
-                  command: toggleMark(this.editorSchema.marks.em),
-                  dom: this.icon("i", "em")
-              },
-              {
-                  command: setBlockType(this.editorSchema.nodes.paragraph),
-                  dom: this.icon("p", "paragraph")
-              },
-              this.heading(1),
-              this.heading(2),
-              this.heading(3),
-              {
-                  command: wrapIn(this.editorSchema.nodes.blockquote),
-                  dom: this.icon(">", "blockquote")
-              }
-          ];
-      }
-
       addNodes(nodes, newNodes){
           Object.keys(newNodes).forEach(key => {
               nodes = nodes.addToEnd(key, newNodes[key]);
@@ -14228,24 +14154,7 @@
           return nodes;
       }
 
-      // Create an icon for a heading at the given level
-      heading(level) {
-          return {
-              command: setBlockType(this.editorSchema.nodes.heading, {
-                  level
-              }),
-              dom: this.icon("H" + level, "heading")
-          }
-      }
 
-      // Helper function to create menu icons
-      icon(text, name) {
-          let span = document.createElement("span");
-          span.className = "menuicon " + name;
-          span.title = name;
-          span.textContent = text;
-          return span;
-      }
 
   };
 
